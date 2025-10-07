@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="../assets/icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/pages/nosotros.css">
+
+    <title>EcoRuta - Nosotros</title>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div id="logo">
+                <a href="../index.html">
+                    <img src="../assets/logo_grande.png" alt="EcoRuta">
+                </a>
+            </div>
+            <button id="abrir_hamburguesa" class="abrir_menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <nav class="nav" id="nav">
+                <button id="cerrar_hamburguesa" class="cerrar_menu">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="./guia_uso.html">Guía de Uso</a></li>
+                    <li><a href="./vehiculos.html">Vehículos</a></li>
+                    <li><a href="./configuracion.html">Configuración</a></li>
+                    <li><a href="./nosotros.html">Nosotros</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-nosotros">
+        <h1>Conoce EcoRuta</h1>
+        <p>Transformando la forma en que planificas tus viajes por Argentina</p>
+    </section>
+
+    <main>
+        <!-- Misión -->
+        <div class="mission-card">
+            <h2>¿Quiénes somos?</h2>
+            <p>
+                En EcoRuta, nuestro objetivo es facilitar la logística de viajes en Argentina, ya sea para personas o empresas. Ofrecemos cálculos aproximados sobre los costos de combustible y peajes, información básica sobre el consumo del vehículo, y referencias de estaciones de servicio para que puedas planificar tus paradas estratégicamente.
+            </p>
+            <p>
+                Nuestro propósito es ayudarte a disfrutar de un viaje más eficiente, organizado y económico, proporcionándote todas las herramientas necesarias para tomar decisiones informadas antes de salir a la ruta.
+            </p>
+        </div>
+
+        <!-- Valores -->
+        <div class="values-section">
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">💰</div>
+                    <h3>Ahorro Garantizado</h3>
+                    <p>Optimizamos tus rutas para que gastes menos en combustible y peajes</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">🗺️</div>
+                    <h3>Planificación Precisa</h3>
+                    <p>Cálculos detallados basados en datos reales de estaciones y peajes</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">⚡</div>
+                    <h3>Rápido y Simple</h3>
+                    <p>Interfaz intuitiva que te da resultados en segundos</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">🇦🇷</div>
+                    <h3>Cobertura Nacional</h3>
+                    <p>Información actualizada de toda Argentina</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>1000+</h4>
+                    <p>Estaciones de Servicio</p>
+                </div>
+                <div class="stat-item">
+                    <h4>130+</h4>
+                    <p>Peajes Registrados</p>
+                </div>
+                <div class="stat-item">
+                    <h4>100%</h4>
+                    <p>Gratis y Accesible</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team/Contact -->
+        <div class="team-section">
+            <h2>Nuestro Equipo</h2>
+            <p>
+                Somos un equipo apasionado por la tecnología y los viajes, comprometidos con hacer tu experiencia en la ruta más económica y placentera. Trabajamos constantemente para mejorar nuestros servicios y agregar nuevas funcionalidades.
+            </p>
+            <div class="contact-buttons">
+                <a href="mailto:info@ecoruta.com" class="btn-contact">
+                    <i class="bi bi-envelope"></i> Contáctanos
+                </a>
+                <a href="#" class="btn-contact">
+                    <i class="bi bi-question-circle"></i> Preguntas Frecuentes
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>EcoRuta</h3>
+                <p>Tu herramienta confiable para planificar viajes económicos por Argentina.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Enlaces Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="../index.html"><i class="bi bi-house"></i> Inicio</a></li>
+                    <li><a href="./guia_uso.html"><i class="bi bi-book"></i> Guía de Uso</a></li>
+                    <li><a href="./vehiculos.html"><i class="bi bi-car-front"></i> Vehículos</a></li>
+                    <li><a href="./configuracion.html"><i class="bi bi-gear"></i> Configuración</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 EcoRuta - Tu Viaje Económico. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Menu hamburguesa
+        const nav = document.querySelector("#nav");
+        const abrir = document.querySelector("#abrir_hamburguesa");
+        const cerrar = document.querySelector("#cerrar_hamburguesa");
+
+        abrir.addEventListener("click", () => nav.classList.add("visible"));
+        cerrar.addEventListener("click", () => nav.classList.remove("visible"));
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset=utf-8 />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+	<title>Leaflet.Freezy – Demo</title>
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+	<link rel="stylesheet" type="text/css" href="demo.css"/>
+</head>
+
+<body>
+	<h1>Leaflet.Freezy – Demo</h1>
+
+	<p style="line-height: 60px; background: url(gitlab-logo.svg) 0px 8px no-repeat; background-size: 40px; padding-left: 60px;">
+	<a href="https://gitlab.com/mrubli/leaflet-freezy">Leaflet.Freezy on GitLab</a>
+	</p>
+
+	<p>
+	This page illustrates how embedded maps can interfere with page scrolling.
+	Scroll down slowly past the filler text and the maps using the mouse wheel or a finger swipe to see the difference.
+	</p>
+
+	<div class="loremipsum">
+	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida dictum fusce ut placerat. Ante in nibh mauris cursus mattis molestie a iaculis. Non pulvinar neque laoreet suspendisse interdum. Elementum facilisis leo vel fringilla est. Tellus mauris a diam maecenas sed enim ut sem viverra. Id volutpat lacus laoreet non curabitur gravida. In cursus turpis massa tincidunt dui. Aliquet risus feugiat in ante metus dictum at tempor commodo. Nunc id cursus metus aliquam. Diam maecenas ultricies mi eget mauris pharetra et. Tincidunt praesent semper feugiat nibh sed. Venenatis a condimentum vitae sapien pellentesque habitant morbi tristique senectus.</p>
+	<p>Amet facilisis magna etiam tempor orci eu lobortis elementum. Egestas diam in arcu cursus euismod quis viverra nibh cras. Ante in nibh mauris cursus mattis molestie a. Arcu odio ut sem nulla pharetra diam sit amet nisl. Parturient montes nascetur ridiculus mus mauris vitae. Elementum nisi quis eleifend quam adipiscing vitae proin sagittis. Tortor condimentum lacinia quis vel eros donec ac odio. Orci sagittis eu volutpat odio facilisis. Consectetur purus ut faucibus pulvinar. Tempor orci dapibus ultrices in iaculis nunc. Faucibus interdum posuere lorem ipsum.</p>
+	<p>Tincidunt tortor aliquam nulla facilisi cras fermentum. Mauris a diam maecenas sed enim. Sit amet nisl suscipit adipiscing bibendum. Ut lectus arcu bibendum at. Ullamcorper eget nulla facilisi etiam dignissim diam quis enim lobortis. Nulla posuere sollicitudin aliquam ultrices sagittis orci. Arcu non odio euismod lacinia. Malesuada fames ac turpis egestas. Orci phasellus egestas tellus rutrum tellus. Praesent elementum facilisis leo vel fringilla est ullamcorper eget nulla. Dis parturient montes nascetur ridiculus mus mauris vitae ultricies leo. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Sed ullamcorper morbi tincidunt ornare massa eget egestas purus. Ultrices dui sapien eget mi proin. A diam maecenas sed enim ut sem viverra aliquet eget. Gravida cum sociis natoque penatibus et. Magna etiam tempor orci eu lobortis. Feugiat in ante metus dictum at. Venenatis urna cursus eget nunc scelerisque viverra.</p>
+	<p>Ac turpis egestas integer eget aliquet nibh praesent tristique. Nisl condimentum id venenatis a. Maecenas accumsan lacus vel facilisis volutpat est velit. Amet justo donec enim diam vulputate ut pharetra sit amet. Fermentum posuere urna nec tincidunt praesent semper feugiat nibh. Aliquet bibendum enim facilisis gravida neque. Nisi lacus sed viverra tellus in hac. Lectus nulla at volutpat diam. Sed lectus vestibulum mattis ullamcorper. Mi eget mauris pharetra et. Consectetur libero id faucibus nisl tincidunt eget. Augue interdum velit euismod in. Eleifend mi in nulla posuere. Cras fermentum odio eu feugiat. Suspendisse ultrices gravida dictum fusce ut placerat. Egestas pretium aenean pharetra magna ac placerat vestibulum lectus mauris. Adipiscing at in tellus integer feugiat. Urna id volutpat lacus laoreet non curabitur gravida. Odio facilisis mauris sit amet.</p>
+	<p>Donec et odio pellentesque diam volutpat commodo sed egestas egestas. Tempus iaculis urna id volutpat lacus laoreet. Aliquet lectus proin nibh nisl condimentum id venenatis. Lectus magna fringilla urna porttitor rhoncus dolor purus. Vivamus arcu felis bibendum ut tristique et. Aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi. Nunc id cursus metus aliquam eleifend. Viverra nam libero justo laoreet sit amet cursus sit amet. Nunc aliquet bibendum enim facilisis gravida neque convallis a cras. Est ante in nibh mauris. Iaculis at erat pellentesque adipiscing commodo elit at imperdiet. Fames ac turpis egestas maecenas pharetra convallis posuere morbi. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim.	</div></p>
+	</div>
+
+	<p>
+	Watch out, here it comes …
+	</p>
+
+	<h2>Standard map</h2>
+
+	<div id="normal-map" class="map-container"></div>
+
+	<p>
+	Well, that was annoying!
+	</p>
+
+	<div class="loremipsum">
+	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida dictum fusce ut placerat. Ante in nibh mauris cursus mattis molestie a iaculis. Non pulvinar neque laoreet suspendisse interdum. Elementum facilisis leo vel fringilla est. Tellus mauris a diam maecenas sed enim ut sem viverra. Id volutpat lacus laoreet non curabitur gravida. In cursus turpis massa tincidunt dui. Aliquet risus feugiat in ante metus dictum at tempor commodo. Nunc id cursus metus aliquam. Diam maecenas ultricies mi eget mauris pharetra et. Tincidunt praesent semper feugiat nibh sed. Venenatis a condimentum vitae sapien pellentesque habitant morbi tristique senectus.</p>
+	<p>Amet facilisis magna etiam tempor orci eu lobortis elementum. Egestas diam in arcu cursus euismod quis viverra nibh cras. Ante in nibh mauris cursus mattis molestie a. Arcu odio ut sem nulla pharetra diam sit amet nisl. Parturient montes nascetur ridiculus mus mauris vitae. Elementum nisi quis eleifend quam adipiscing vitae proin sagittis. Tortor condimentum lacinia quis vel eros donec ac odio. Orci sagittis eu volutpat odio facilisis. Consectetur purus ut faucibus pulvinar. Tempor orci dapibus ultrices in iaculis nunc. Faucibus interdum posuere lorem ipsum.</p>
+	<p>Tincidunt tortor aliquam nulla facilisi cras fermentum. Mauris a diam maecenas sed enim. Sit amet nisl suscipit adipiscing bibendum. Ut lectus arcu bibendum at. Ullamcorper eget nulla facilisi etiam dignissim diam quis enim lobortis. Nulla posuere sollicitudin aliquam ultrices sagittis orci. Arcu non odio euismod lacinia. Malesuada fames ac turpis egestas. Orci phasellus egestas tellus rutrum tellus. Praesent elementum facilisis leo vel fringilla est ullamcorper eget nulla. Dis parturient montes nascetur ridiculus mus mauris vitae ultricies leo. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Sed ullamcorper morbi tincidunt ornare massa eget egestas purus. Ultrices dui sapien eget mi proin. A diam maecenas sed enim ut sem viverra aliquet eget. Gravida cum sociis natoque penatibus et. Magna etiam tempor orci eu lobortis. Feugiat in ante metus dictum at. Venenatis urna cursus eget nunc scelerisque viverra.</p>
+	<p>Ac turpis egestas integer eget aliquet nibh praesent tristique. Nisl condimentum id venenatis a. Maecenas accumsan lacus vel facilisis volutpat est velit. Amet justo donec enim diam vulputate ut pharetra sit amet. Fermentum posuere urna nec tincidunt praesent semper feugiat nibh. Aliquet bibendum enim facilisis gravida neque. Nisi lacus sed viverra tellus in hac. Lectus nulla at volutpat diam. Sed lectus vestibulum mattis ullamcorper. Mi eget mauris pharetra et. Consectetur libero id faucibus nisl tincidunt eget. Augue interdum velit euismod in. Eleifend mi in nulla posuere. Cras fermentum odio eu feugiat. Suspendisse ultrices gravida dictum fusce ut placerat. Egestas pretium aenean pharetra magna ac placerat vestibulum lectus mauris. Adipiscing at in tellus integer feugiat. Urna id volutpat lacus laoreet non curabitur gravida. Odio facilisis mauris sit amet.</p>
+	<p>Donec et odio pellentesque diam volutpat commodo sed egestas egestas. Tempus iaculis urna id volutpat lacus laoreet. Aliquet lectus proin nibh nisl condimentum id venenatis. Lectus magna fringilla urna porttitor rhoncus dolor purus. Vivamus arcu felis bibendum ut tristique et. Aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi. Nunc id cursus metus aliquam eleifend. Viverra nam libero justo laoreet sit amet cursus sit amet. Nunc aliquet bibendum enim facilisis gravida neque convallis a cras. Est ante in nibh mauris. Iaculis at erat pellentesque adipiscing commodo elit at imperdiet. Fames ac turpis egestas maecenas pharetra convallis posuere morbi. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim.	</div></p>
+	</div>
+
+	<h2>Freezy map ❄️</h2>
+
+	<p>
+	Let's see if we can do better.
+	</p>
+
+	<div id="freezy-map" class="map-container"></div>
+
+	<p>
+	Yay!
+	You scrolled or swiped past the map without interference.
+	(If you still encountered scroll capture, don't worry, there are options to tune the behavior for your use case.)
+	</p>
+
+	<div class="loremipsum">
+	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida dictum fusce ut placerat. Ante in nibh mauris cursus mattis molestie a iaculis. Non pulvinar neque laoreet suspendisse interdum. Elementum facilisis leo vel fringilla est. Tellus mauris a diam maecenas sed enim ut sem viverra. Id volutpat lacus laoreet non curabitur gravida. In cursus turpis massa tincidunt dui. Aliquet risus feugiat in ante metus dictum at tempor commodo. Nunc id cursus metus aliquam. Diam maecenas ultricies mi eget mauris pharetra et. Tincidunt praesent semper feugiat nibh sed. Venenatis a condimentum vitae sapien pellentesque habitant morbi tristique senectus.</p>
+	<p>Amet facilisis magna etiam tempor orci eu lobortis elementum. Egestas diam in arcu cursus euismod quis viverra nibh cras. Ante in nibh mauris cursus mattis molestie a. Arcu odio ut sem nulla pharetra diam sit amet nisl. Parturient montes nascetur ridiculus mus mauris vitae. Elementum nisi quis eleifend quam adipiscing vitae proin sagittis. Tortor condimentum lacinia quis vel eros donec ac odio. Orci sagittis eu volutpat odio facilisis. Consectetur purus ut faucibus pulvinar. Tempor orci dapibus ultrices in iaculis nunc. Faucibus interdum posuere lorem ipsum.</p>
+	<p>Tincidunt tortor aliquam nulla facilisi cras fermentum. Mauris a diam maecenas sed enim. Sit amet nisl suscipit adipiscing bibendum. Ut lectus arcu bibendum at. Ullamcorper eget nulla facilisi etiam dignissim diam quis enim lobortis. Nulla posuere sollicitudin aliquam ultrices sagittis orci. Arcu non odio euismod lacinia. Malesuada fames ac turpis egestas. Orci phasellus egestas tellus rutrum tellus. Praesent elementum facilisis leo vel fringilla est ullamcorper eget nulla. Dis parturient montes nascetur ridiculus mus mauris vitae ultricies leo. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Sed ullamcorper morbi tincidunt ornare massa eget egestas purus. Ultrices dui sapien eget mi proin. A diam maecenas sed enim ut sem viverra aliquet eget. Gravida cum sociis natoque penatibus et. Magna etiam tempor orci eu lobortis. Feugiat in ante metus dictum at. Venenatis urna cursus eget nunc scelerisque viverra.</p>
+	<p>Ac turpis egestas integer eget aliquet nibh praesent tristique. Nisl condimentum id venenatis a. Maecenas accumsan lacus vel facilisis volutpat est velit. Amet justo donec enim diam vulputate ut pharetra sit amet. Fermentum posuere urna nec tincidunt praesent semper feugiat nibh. Aliquet bibendum enim facilisis gravida neque. Nisi lacus sed viverra tellus in hac. Lectus nulla at volutpat diam. Sed lectus vestibulum mattis ullamcorper. Mi eget mauris pharetra et. Consectetur libero id faucibus nisl tincidunt eget. Augue interdum velit euismod in. Eleifend mi in nulla posuere. Cras fermentum odio eu feugiat. Suspendisse ultrices gravida dictum fusce ut placerat. Egestas pretium aenean pharetra magna ac placerat vestibulum lectus mauris. Adipiscing at in tellus integer feugiat. Urna id volutpat lacus laoreet non curabitur gravida. Odio facilisis mauris sit amet.</p>
+	<p>Donec et odio pellentesque diam volutpat commodo sed egestas egestas. Tempus iaculis urna id volutpat lacus laoreet. Aliquet lectus proin nibh nisl condimentum id venenatis. Lectus magna fringilla urna porttitor rhoncus dolor purus. Vivamus arcu felis bibendum ut tristique et. Aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi. Nunc id cursus metus aliquam eleifend. Viverra nam libero justo laoreet sit amet cursus sit amet. Nunc aliquet bibendum enim facilisis gravida neque convallis a cras. Est ante in nibh mauris. Iaculis at erat pellentesque adipiscing commodo elit at imperdiet. Fames ac turpis egestas maecenas pharetra convallis posuere morbi. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim.	</div></p>
+	</div>
+
+	<script>
+		const osm = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+		const freezyMap = L.map('freezy-map').setView([46.8224, 8.2241], 7).addLayer(L.tileLayer(osm));
+		L.control.freezeMapControl({}).addTo(freezyMap);
+		const normalMap = L.map('normal-map').setView([46.8224, 8.2241], 7).addLayer(L.tileLayer(osm));
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="../assets/icon.png" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <link rel="stylesheet" href="../css/pages/vehiculos.css">
+
+    <title>EcoRuta - Vehículos</title>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div id="logo">
+                <a href="../index.html">
+                    <img src="../assets/logo_grande.png" alt="EcoRuta">
+                </a>
+            </div>
+            <button id="abrir_hamburguesa" class="abrir_menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <nav class="nav" id="nav">
+                <button id="cerrar_hamburguesa" class="cerrar_menu">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="./guia_uso.html">Guía de Uso</a></li>
+                    <li><a href="./vehiculos.html">Vehículos</a></li>
+                    <li><a href="./configuracion.html">Configuración</a></li>
+                    <li><a href="./nosotros.html">Nosotros</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <h1>Base de Datos de Vehículos</h1>
+        <p>Consulta el rendimiento y características técnicas de diferentes modelos</p>
+    </section>
+
+    <main class="main-container">
+        <!-- Formulario de Búsqueda -->
+        <div class="card-modern">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h2 class="card-title">Buscar Vehículo</h2>
+            </div>
+
+            <form id="form-configuracion">
+                <div class="form-grid">
+                    <div class="form-group-modern">
+                        <label for="marca">
+                            <i class="bi bi-tag"></i> Marca
+                        </label>
+                        <select class="form-control-modern" id="marca" name="marca">
+                            <option value="">Todas las marcas</option>
+                            <option value="volkswagen">Volkswagen</option>
+                            <option value="chevrolet">Chevrolet</option>
+                            <option value="toyota">Toyota</option>
+                            <option value="citroen">Citroen</option>
+                            <option value="ford">Ford</option>
+                            <option value="renault">Renault</option>
+                            <option value="fiat">Fiat</option>
+                            <option value="jeep">Jeep</option>
+                            <option value="mercedesbenz">Mercedes Benz</option>
+                            <option value="mini">Mini</option>
+                            <option value="nissan">Nissan</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="modelo">
+                            <i class="bi bi-car-front"></i> Modelo
+                        </label>
+                        <input type="text" id="modelo" name="modelo" class="form-control-modern" 
+                               placeholder="Ej: Gol, Corolla, Focus">
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="motor">
+                            <i class="bi bi-gear"></i> Motor
+                        </label>
+                        <input type="text" id="motor" name="motor" class="form-control-modern" 
+                               placeholder="Ej: 1.6, 2.0 TSI">
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="combustible">
+                            <i class="bi bi-fuel-pump"></i> Combustible
+                        </label>
+                        <select class="form-control-modern" id="combustible" name="combustible">
+                            <option value="">Todos los tipos</option>
+                            <option value="nafta">Nafta</option>
+                            <option value="diesel">Diesel</option>
+                            <option value="electrico">Eléctrico</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="boton_configuracion" class="btn-primary-modern" type="button">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <button id="boton_configuracion02" class="btn-danger-modern" type="button">
+                        <i class="bi bi-trash"></i> Limpiar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabla de Resultados -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3><i class="bi bi-table"></i> Resultados</h3>
+            </div>
+            <div class="table-wrapper">
+                <table id="csv-table" class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Motor</th>
+                            <th>Manual</th>
+                            <th>Automática</th>
+                            <th>Combustible</th>
+                            <th>Tanque (L)</th>
+                            <th>Ciudad</th>
+                            <th>Ruta 90</th>
+                            <th>Ruta 110</th>
+                            <th>Ruta 130</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los datos se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination-container">
+            <button id="boton-anterior" class="pagination-btn" disabled>
+                <i class="bi bi-chevron-left"></i> Anterior
+            </button>
+            <span class="page-number" id="pagina-actual">1</span>
+            <button id="boton-siguiente" class="pagination-btn" disabled>
+                Siguiente <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Aviso -->
+        <div class="alert-card">
+            <div class="alert-icon">⚠️</div>
+            <p><strong>Importante:</strong> Todos los datos fueron generados mediante inteligencia artificial y son aproximaciones estimadas del consumo de cada vehículo.</p>
+            <p>Esta información es una referencia general. Recomendamos utilizar tus propios datos de consumo para mayor precisión.</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>EcoRuta</h3>
+                <p>Tu herramienta confiable para planificar viajes económicos por Argentina.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Enlaces Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="../index.html"><i class="bi bi-house"></i> Inicio</a></li>
+                    <li><a href="./guia_uso.html"><i class="bi bi-book"></i> Guía de Uso</a></li>
+                    <li><a href="./vehiculos.html"><i class="bi bi-car-front"></i> Vehículos</a></li>
+                    <li><a href="./configuracion.html"><i class="bi bi-gear"></i> Configuración</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 EcoRuta - Tu Viaje Económico. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Menu hamburguesa
+        const nav = document.querySelector("#nav");
+        const abrir = document.querySelector("#abrir_hamburguesa");
+        const cerrar = document.querySelector("#cerrar_hamburguesa");
+
+        abrir.addEventListener("click", () => nav.classList.add("visible"));
+        cerrar.addEventListener("click", () => nav.classList.remove("visible"));
+
+        // Script de vehículos (mantener el original vehicleSearch.js)
+    </script>
+    <script src="../js/vehicleSearch.js"></script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./assets/icon.png" type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Incluye el CSS de Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
+    <!-- Incluye el CSS de Leaflet Routing Machine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+    <!-- Incluye Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <!-- Incluye Leaflet Routing Machine -->
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+    <!-- Incluye Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.0/leaflet.markercluster.js"></script>
+
+    <!-- Plugin Freeze Map -->
+    <script type="module" src="plugins/leaflet-freezy-master/src/index.js"></script>
+
+    <!-- Tu CSS personalizado -->
+    <link rel="stylesheet" href="./css/pages/index.css">
+    
+    <script src="./js/main.js"></script>
+
+    <title>EcoRuta - Tu Viaje Económico</title>
+
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div id="logo">
+                <a href="./index.html">
+                    <img src="/assets/logo_grande.png" alt="EcoRuta">
+                </a>
+            </div>
+            <button id="abrir_hamburguesa" class="abrir_menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <nav class="nav" id="nav">
+                <button id="cerrar_hamburguesa" class="cerrar_menu">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="./pages/guia_uso.html">Guía de Uso</a></li>
+                    <li><a href="./pages/vehiculos.html">Vehículos</a></li>
+                    <li><a href="./pages/configuracion.html">Configuración</a></li>
+                    <li><a href="./pages/nosotros.html">Nosotros</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Planifica tu viaje</h1>
+            <p>Calcula costos de combustible, peajes y encuentra las mejores rutas por Argentina</p>
+        </div>
+    </section>
+
+    <main class="main-container">
+        <!-- Formulario -->
+        <div class="card-modern">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <h2 class="card-title">Detalles del Viaje</h2>
+            </div>
+
+            <form id="formulario-viaje">
+                <div class="form-grid">
+                    <div class="form-group-modern">
+                        <label for="inputOrigen">
+                            <i class="bi bi-pin-map"></i> Punto de Origen
+                        </label>
+                        <input type="text" id="inputOrigen" class="form-control-modern" 
+                               placeholder="Ej: Buenos Aires, CABA" required>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="inputDestino">
+                            <i class="bi bi-flag"></i> Destino
+                        </label>
+                        <input type="text" id="inputDestino" class="form-control-modern" 
+                               placeholder="Ej: Córdoba, Córdoba" required>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="inputTipoCombustible">
+                            <i class="bi bi-fuel-pump"></i> Tipo de Combustible
+                        </label>
+                        <select id="inputTipoCombustible" class="form-control-modern" required>
+                            <option value="">Selecciona el tipo</option>
+                            <option value="Nafta (súper) entre 92 y 95 Ron">Nafta Super</option>
+                            <option value="Nafta (premium) de más de 95 Ron">Nafta Premium</option>
+                            <option value="Gas Oil Grado 2">Gasoil Diesel</option>
+                            <option value="Gas Oil Grado 3">Gasoil Premium</option>
+                            <option value="GNC">GNC</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="capacidadTanque">
+                            <i class="bi bi-droplet"></i> Capacidad del Tanque (litros)
+                        </label>
+                        <input type="number" id="capacidadTanque" class="form-control-modern" 
+                               placeholder="Ej: 50" min="1" max="600" required>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label>
+                            <i class="bi bi-speedometer"></i> Rendimiento (km/litro)
+                        </label>
+                        <div class="range-container">
+                            <button type="button" class="range-btn" id="decreaseBtn">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="range" id="kmsPorLitro" class="range-input" 
+                                   min="1" max="28" step="0.1" value="14">
+                            <span class="range-display" id="rangeValue">14.0</span>
+                            <button type="button" class="range-btn" id="increaseBtn">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary-modern" style="flex: 1;">
+                        <i class="bi bi-calculator"></i> Calcular Ruta
+                    </button>
+                    <button type="reset" class="btn-secondary-modern">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Mapa -->
+        <div id="mapa">
+            <div id="map"></div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="card-modern">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <h2 class="card-title">Resultados del Viaje</h2>
+            </div>
+
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-icon">🛣️</div>
+                    <div class="result-label">Distancia</div>
+                    <div class="result-value" id="resultado-km">-</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-icon">⏱️</div>
+                    <div class="result-label">Tiempo</div>
+                    <div class="result-value" id="resultado-tiempo">-</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-icon">⛽</div>
+                    <div class="result-label">Combustible</div>
+                    <div class="result-value" id="resultado-litros">-</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-icon">💰</div>
+                    <div class="result-label">Costo Combustible</div>
+                    <div class="result-value" id="resultado-gasto">-</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-icon">🎫</div>
+                    <div class="result-label">Peajes Efectivo</div>
+                    <div class="result-value" id="resultado-total-peajes-efectivo">-</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-icon">📱</div>
+                    <div class="result-label">Telepase</div>
+                    <div class="result-value" id="resultado-total-peajes-telepase">-</div>
+                </div>
+            </div>
+
+            <div class="total-card">
+                <div class="total-label">💵 Costo Total del Viaje (Ida)</div>
+                <div class="total-value" id="gasto-total">$ 0</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>EcoRuta</h3>
+                <p>Tu herramienta confiable para planificar viajes económicos por Argentina.</p>
+                <p>Calcula costos, encuentra rutas óptimas y ahorra en cada kilómetro.</p>
+                <div class="footer-social">
+                    <a href="#" class="social-icon" aria-label="Facebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Twitter">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="LinkedIn">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h3>Enlaces Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="./index.html"><i class="bi bi-house"></i> Inicio</a></li>
+                    <li><a href="./pages/guia_uso.html"><i class="bi bi-book"></i> Guía de Uso</a></li>
+                    <li><a href="./pages/vehiculos.html"><i class="bi bi-car-front"></i> Vehículos</a></li>
+                    <li><a href="./pages/configuracion.html"><i class="bi bi-gear"></i> Configuración</a></li>
+                    <li><a href="./pages/nosotros.html"><i class="bi bi-people"></i> Nosotros</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Contacto</h3>
+                <ul class="footer-links">
+                    <li><a href="mailto:info@ecoruta.com"><i class="bi bi-envelope"></i> info@ecoruta.com</a></li>
+                    <li><a href="tel:+5493515000000"><i class="bi bi-telephone"></i> +54 9 351 5000000</a></li>
+                    <li><i class="bi bi-geo-alt"></i> Córdoba, Argentina</li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Recursos</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="bi bi-file-text"></i> Términos y Condiciones</a></li>
+                    <li><a href="#"><i class="bi bi-shield-check"></i> Política de Privacidad</a></li>
+                    <li><a href="#"><i class="bi bi-question-circle"></i> Preguntas Frecuentes</a></li>
+                    <li><a href="#"><i class="bi bi-headset"></i> Soporte</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 EcoRuta - Tu Viaje Económico. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+
+    
+</body>
+</html>

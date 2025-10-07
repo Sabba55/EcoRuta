@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="../assets/icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/pages/configuracion.css">
+
+    <title>EcoRuta - Configuración</title>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div id="logo">
+                <a href="../index.html">
+                    <img src="../assets/logo_grande.png" alt="EcoRuta">
+                </a>
+            </div>
+            <button id="abrir_hamburguesa" class="abrir_menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <nav class="nav" id="nav">
+                <button id="cerrar_hamburguesa" class="cerrar_menu">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="./guia_uso.html">Guía de Uso</a></li>
+                    <li><a href="./vehiculos.html">Vehículos</a></li>
+                    <li><a href="./configuracion.html">Configuración</a></li>
+                    <li><a href="./nosotros.html">Nosotros</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <h1>Configuración del Viaje</h1>
+        <p>Personaliza los detalles de tu vehículo y telepases</p>
+    </section>
+
+    <main class="main-container">
+        <!-- Configuración del Vehículo -->
+        <div class="card-modern">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-car-front-fill"></i>
+                </div>
+                <h2 class="card-title">Tipo de Vehículo</h2>
+            </div>
+
+            <div class="form-group-modern">
+                <label for="tipo-vehiculo">
+                    <i class="bi bi-truck"></i> Categoría del Vehículo
+                </label>
+                <select class="form-control-modern" id="tipo-vehiculo">
+                    <option value="">Selecciona un tipo de vehículo</option>
+                    <option value="vehiculo_01">Motocicleta</option>
+                    <option value="vehiculo_02">Auto, Camioneta</option>
+                    <option value="vehiculo_03">Auto, Camioneta (Con trailer)</option>
+                    <option value="vehiculo_04">Camión (Con y sin trailer)</option>
+                    <option value="vehiculo_05">Colectivo</option>
+                </select>
+            </div>
+
+            <div class="two-column-grid">
+                <div class="form-group-modern">
+                    <label for="cantidad-ejes">
+                        <i class="bi bi-circle-fill"></i> Cantidad de Ejes
+                    </label>
+                    <select class="form-control-modern" id="cantidad-ejes">
+                        <option value="">Selecciona la cant. de ejes</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="+6">+6</option>
+                    </select>
+                </div>
+
+                <div class="form-group-modern">
+                    <label for="altura">
+                        <i class="bi bi-arrows-vertical"></i> Altura del Vehículo
+                    </label>
+                    <select class="form-control-modern" id="altura">
+                        <option value="">Selecciona la altura</option>
+                        <option value="(tall < 2.10m)">Menor a 2,10m</option>
+                        <option value="(tall < 2.30m)">Menor a 2,30m</option>
+                        <option value="(tall > 2.10m)">Mayor a 2,10m</option>
+                        <option value="(tall > 2.30m)">Mayor a 2,30m</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combustible Internacional -->
+        <div class="card-modern">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-fuel-pump-fill"></i>
+                </div>
+                <h2 class="card-title">Combustible Internacional</h2>
+            </div>
+
+            <div class="form-group-modern">
+                <label for="precio-combustible">
+                    <i class="bi bi-cash-coin"></i> Precio de Combustible (ARS)
+                </label>
+                <input type="number" id="precio-combustible" value="1200" min="1000" max="1800"
+                       class="form-control-modern" placeholder="Ingresa el precio en pesos">
+                <p id="error-msg" class="error-message">
+                    <i class="bi bi-exclamation-triangle"></i> El precio debe estar entre $1000 y $1800
+                </p>
+            </div>
+
+            <div class="info-box">
+                <p><i class="bi bi-info-circle"></i> Este precio se utilizará para calcular costos en países limítrofes</p>
+            </div>
+        </div>
+
+        <!-- Nivel de Carga del Tanque -->
+        <div class="card-modern">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-droplet-fill"></i>
+                </div>
+                <h2 class="card-title">Nivel de Recarga</h2>
+            </div>
+
+            <div class="form-group-modern">
+                <label>
+                    <i class="bi bi-speedometer"></i> Cargar tanque cuando consuma el:
+                </label>
+                <div class="range-wrapper">
+                    <div class="range-value-display">
+                        <span id="rangeValue">55</span>
+                    </div>
+                    <input type="range" id="carga_tanque" class="range-input" 
+                           min="40" max="80" step="5" value="55">
+                    <div class="range-labels">
+                        <span>40%</span>
+                        <span>80%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <p><i class="bi bi-info-circle"></i> Define cuándo quieres recargar combustible durante tu viaje</p>
+            </div>
+        </div>
+
+        <!-- Telepases -->
+        <div class="card-modern">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-credit-card-fill"></i>
+                </div>
+                <h2 class="card-title">Telepases de Argentina</h2>
+            </div>
+
+            <div id="tabla-telepase" class="telepase-grid">
+                <!-- Se llenará dinámicamente con JavaScript -->
+            </div>
+
+            <div class="info-box" style="margin-top: 1.5rem;">
+                <p><i class="bi bi-info-circle"></i> Selecciona los telepases que tienes para calcular tarifas especiales</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>EcoRuta</h3>
+                <p>Tu herramienta confiable para planificar viajes económicos por Argentina.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Enlaces Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="../index.html"><i class="bi bi-house"></i> Inicio</a></li>
+                    <li><a href="./guia_uso.html"><i class="bi bi-book"></i> Guía de Uso</a></li>
+                    <li><a href="./vehiculos.html"><i class="bi bi-car-front"></i> Vehículos</a></li>
+                    <li><a href="./configuracion.html"><i class="bi bi-gear"></i> Configuración</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 EcoRuta - Tu Viaje Económico. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/configuraciones.js"></script>
+</body>
+</html>

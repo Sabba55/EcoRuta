@@ -1,0 +1,39 @@
+.leaflet-control-freeze-button {
+	font-size: 16px;
+}
+
+.leaflet-control-freeze-button-frozen {
+	display: none;
+}
+
+.leaflet-control-freeze-button-thawed {
+}
+
+.leaflet-container {
+	transition: opacity 0.4s;
+}
+
+.leaflet-frozen-note-box {
+	max-width: 80%;
+	width: auto;
+	z-index: 1000;
+	margin: auto; /* center within map */
+	border: 2px solid black;
+	border-radius: 6px;
+	background: #000;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	text-align: center; /* center text within container */
+	opacity: 0.8;
+	transition: opacity 0.4s;
+	pointer-events: none;
+}
+
+.leaflet-frozen-note-text {
+	padding: 4px;
+	display: inline-block; /* shrink to fit text */
+	text-align: center; /* center text within container */
+	font-size: 1.8em;
+	color: white;
+}

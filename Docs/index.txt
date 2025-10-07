@@ -1,0 +1,200 @@
+ESTO ES UNA COPIA DE LA ETAPA INICIAL ARMADA
+FUE REMPLAZADO PARA PROBARLO EL 01/10/25
+
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/style.css">
+
+        <!-- mini logo -->
+        <link rel="shortcut icon" href="./assets/icon.png" type="image/x-icon">
+
+        <!-- Incluye Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        
+        <!-- Incluye el CSS de Leaflet -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+
+        <!-- Incluye el CSS de Leaflet Routing Machine -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+        <!-- Incluye Leaflet -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+        <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+        <!-- Incluye Leaflet Routing Machine -->
+        <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+        <!-- Incluye Leaflet Control Geocoder -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.0/leaflet.markercluster.js"></script>
+
+        <!-- Plugin Freeze Map -->
+        <script type="module" src="plugins/leaflet-freezy-master/src/index.js"></script>
+
+        <!-- Plugin Leaflet-Ant-Path -->
+        <script src="https://unpkg.com/leaflet-ant-path@1.3.0/dist/leaflet-ant-path.min.js"></script>
+
+
+
+        <title>EcoRuta - Tu Viaje Economico</title>
+    </head>
+
+<body>
+    <header id="header">
+        <div id="logo">
+            <a href="./index.html">
+                <img id="logo-img" src="/assets/logo_grande.png" alt="EcoRuta">
+            </a>
+        </div>
+        <button id="abrir_hamburguesa" class="abrir_menu"><i class="bi bi-list"></i></button>
+        <nav class="nav" id="nav">
+            <button id="cerrar_hamburguesa" class="cerrar_menu"><i class="bi bi-x-lg"></i></button>
+            <ul class="nav-list">
+                <li><a href="#">Inicio</a></li>
+                <li><a href="./pages/guia_uso.html">Guía de Uso</a></li>
+                <li><a href="./pages/vehiculos.html">Vehículos</a></li>
+                <li><a href="./pages/configuracion.html">Configuración</a></li>
+                <li><a href="./pages/nosotros.html">Nosotros</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="informacion">
+            <h2 class="centrado_automatico">Detalles del Viaje</h2>
+            <form id="formulario-viaje">
+                <div class="form-group" >
+                    <label for="inputOrigen" class="form-label">Origen:</label>
+                    <input type="text" id="inputOrigen" class="form-control" placeholder="Ingrese el origen" required>
+                    <div id="sugerenciasOrigen" class="suggestions"></div>
+                </div>
+            
+                <div class="form-group" >
+                    <label for="inputDestino" class="form-label">Destino:</label>
+                    <input type="text" id="inputDestino" class="form-control" placeholder="Ingrese el destino" required>
+                    <div id="sugerenciasDestino" class="suggestions"></div>
+                </div>
+
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <div class="form-group">
+                            <label for="inputTipoCombustible" class="form-label">Tipo de Combustible a usar:</label>
+                            <select id="inputTipoCombustible" class="form-select" required>
+                                <option value="">Selecciona el tipo de combustible</option>
+                                <option value="Nafta (súper) entre 92 y 95 Ron">Nafta Super</option>
+                                <option value="Nafta (premium) de más de 95 Ron">Nafta Premium</option>
+                                <option value="Gas Oil Grado 2">Gasoil Diesel</option>
+                                <option value="Gas Oil Grado 3">Gasoil Premium</option>
+                                <option value="GNC">GNC</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+
+                <div class="form-group">
+                    <label for="capacidadTanque" class="form-label">Capacidad del Tanque (en litros):</label>
+                    <input type="number" id="capacidadTanque" class="form-control" placeholder="Ingrese la capacidad" min="1" max="600" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="kmsPorLitro" class="form-label">Kilómetros con un litro de nafta:</label>
+                    <span id="rangeValue">22</span>
+                    
+                    <div class="form-range-container" style="display: flex; align-items: center; gap: 8px;">
+                        <button type="button" id="decreaseBtn" class="range-icon-button">
+                            <i class="bi bi-caret-left-fill"></i>
+                        </button>
+
+                        <input type="range" id="kmsPorLitro" class="form-range" min="1" max="28" step="0.1" value="14" required style="flex: 1;">
+
+                        <button type="button" id="increaseBtn" class="range-icon-button">
+                            <i class="bi bi-caret-right-fill"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- Botón de envío del formulario -->
+                <div class="boton-group">
+                    <button type="submit" class="btn btn-primary calcular_button">Calcular Ruta</button>
+                    <button type="submit" class="btn btn-primary reiniciar_button">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+    
+        <section id="mapa">
+            <div id="map"></div>
+        </section>        
+
+        <section id="resultados">
+            <h3 class="centrado_automatico">Resultados de los datos ingresados </h3>
+            <div class="resultados_contenedor_01">
+                <div class="resultados_contenedor_basura">
+                    <p>Cantidad de Km:</p>
+                    <span id="resultado-km">0</span>
+                </div>
+                <div class="resultados_contenedor_basura">
+                    <p>Horas de viaje:</p>
+                    <span id="resultado-tiempo">0</span>
+                </div>
+                <div class="resultados_contenedor_basura">
+                    <p>Litros gastados:</p>
+                    <span id="resultado-litros">0</span>
+                </div>
+                <div class="resultados_contenedor_basura">
+                    <p>Gasto en combustibles:</p>
+                    <span id="resultado-gasto">0</span>
+                </div>
+                <div class="resultados_contenedor_basura">
+                    <p>Gasto de peajes en efectivo:</p>
+                    <span id="resultado-total-peajes-efectivo">0</span>
+                </div>
+                <div class="resultados_contenedor_basura">
+                    <p>Gasto en telepase:</p>
+                    <span id="resultado-total-peajes-telepase">0</span>
+                </div>
+            </div>
+        
+            <div class="resultados_contenedor_02">
+                <p>Gasto Total Ida:</p>
+                <div class="button_con_estilo">
+                    <span id="gasto-total">$0</span>
+                </div>
+            </div>
+            
+            <div class="container" style="display: flex; flex-direction: column; align-items: center">
+                <div>
+                    <p>Vehiculo: <span id="index_vehiculo"></span></p>
+                </div>
+                <div>
+                    <p>Combustible internacional: <span id="index_combust_internacional"></span></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 EcoRuta - Tu Viaje Economico</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+
+</body>
+</html>

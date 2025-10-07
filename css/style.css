@@ -1,0 +1,24 @@
+/* ==========================================
+   ECORUTA - HOJA DE ESTILOS PRINCIPAL
+   ========================================== */
+
+/* Importar todos los módulos CSS */
+@import url('base.css');           /* Variables, reset, estilos globales */
+@import url('layout.css');         /* Header, footer, navegación, hero */
+@import url('components.css');     /* Cards, forms, buttons, tables */
+
+/* Importar estilos específicos de cada página */
+@import url('pages/index.css');
+@import url('pages/vehiculos.css');
+@import url('pages/configuracion.css');
+@import url('pages/nosotros.css');
+
+/* Importar responsive al final */
+@import url('responsive.css');
+
+/* ==========================================
+   NOTAS:
+   - Este archivo importa todos los demás CSS
+   - Los archivos están organizados por función
+   - Responsive se carga al final para sobrescribir
+   ========================================== */

@@ -1,0 +1,14 @@
+[
+    { "id": "telepase-nacional", "nombre": "Telepase Nacional" },
+    { "id": "rosario-santafe", "nombre": "Autopista Rosario Santa Fe" },
+    { "id": "ecrp-san-luis", "nombre": "Ente De Control de Rutas - San Luis" },
+    { "id": "camino-sierras", "nombre": "Camino de las Sierras - Cordoba" },
+    { "id": "corredores-viales", "nombre": "Corredores Viales" },
+    { "id": "aubasa", "nombre": "Aubasa" },
+    { "id": "ausa", "nombre": "Ausa" },
+    { "id": "ceamse", "nombre": "Ceamse" },
+    { "id": "caminos-uruguay", "nombre": "Caminos del Rio Uruguay - Entre Rios" },
+    { "id": "autopistas-sol", "nombre": "Autopistas del Sol" },
+    { "id": "autopistas-oeste", "nombre": "Autopistas del Oeste" },
+    { "id": "mercovia-santo-tome", "nombre": "Mercovia S.A - Santo Tome - TVF"}
+]

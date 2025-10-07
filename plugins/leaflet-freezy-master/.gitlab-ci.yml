@@ -1,0 +1,45 @@
+image: node:lts
+
+build-package:
+  stage: build
+  before_script:
+    - npm ci
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist
+
+publish-npm-gitlab:
+  stage: deploy
+  script:
+    - npm config set "@mrubli:registry" "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
+    - npm config set "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken" "${CI_JOB_TOKEN}"
+    - npm publish
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: manual
+
+publish-npm-npmjs:
+  stage: deploy
+  interruptible: false
+  id_tokens:
+    SIGSTORE_ID_TOKEN:
+      aud: sigstore
+  script:
+    - npm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
+    - npm publish --access public --provenance
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: manual
+
+pages:
+  stage: deploy
+  script:
+    - "true"
+  artifacts:
+    paths:
+      - dist
+  publish: dist
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
