@@ -1,0 +1,65 @@
+    // ============== FUNCIONES DE GENERACIÓN DE POPUP
+    function generarPopupPeaje(feature) {
+        const preciosPeaje = feature.properties.precios_peaje || {};
+        const tarifasAgrupadas = new Map();
+
+        // Agrupar tarifas sin duplicados
+        Object.values(preciosPeaje).forEach(tarifa => {
+            tarifa.vehiculos.forEach(vehiculo => {
+                if (!imagenesVehiculos[vehiculo]) return;
+
+                if (!tarifasAgrupadas.has(vehiculo)) {
+                    tarifasAgrupadas.set(vehiculo, {
+                        ejes: imagenesVehiculos[vehiculo].ejes,
+                        imagen: imagenesVehiculos[vehiculo].imagen,
+                        tarifa_basica: tarifa.tarifa_basica ?? "N/A",
+                        telepase_basico: tarifa.telepase_basico ?? "N/A"
+                    });
+                }
+            });
+        });
+
+        return `
+            <div style="font-family: Arial, sans-serif; text-align: center;">
+                <!-- Encabezado -->
+                <div style="margin-bottom: 5px;">
+                    <b style="color: green; font-size: 18px;">${feature.properties.ruta.nombre}</b><br>
+                    <b>Empresa:</b> ${feature.properties.empresa}<br>
+                    <b>Tramo:</b> ${feature.properties.ruta.tramo}
+                </div>
+
+                <!-- Tabla de tarifas -->
+                <div>
+                    <table style="border-collapse: collapse; width: 100%; max-width: 400px; margin: 0 auto; font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #d4edda; border: 1px solid #000;">
+                                <th style="padding: 3px; border: 1px solid #000;">Ejes</th>
+                                <th style="padding: 3px; border: 1px solid #000;">Vehículo</th>
+                                <th style="padding: 3px; border: 1px solid #000;">Tarifa</th>
+                                <th style="padding: 3px; border: 1px solid #000;">Telepase</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Array.from(tarifasAgrupadas.entries()).map(([vehiculo, tarifa]) => `
+                                <tr style="border: 1px solid black; background-color: #f8f9fa;">
+                                    <td style="text-align: center; padding: 3px; border: 1px solid #000;">
+                                        <b>${tarifa.ejes}</b>
+                                    </td>
+                                    <td style="text-align: center; padding: 3px; border: 1px solid #000;">
+                                        <img src="assets/tarifa_peajes/${tarifa.imagen}" 
+                                            alt="${vehiculo}" style="width: 50px; height: auto; vertical-align: middle;">
+                                    </td>
+                                    <td style="text-align: center; padding: 3px; border: 1px solid #000;">
+                                        <b>${tarifa.tarifa_basica}</b>
+                                    </td>
+                                    <td style="text-align: center; padding: 3px; border: 1px solid #000;">
+                                        <b>${tarifa.telepase_basico}</b>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }

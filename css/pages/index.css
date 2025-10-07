@@ -483,10 +483,10 @@ footer {
 }
 
 /* Esto es de cuando se muestra la informacion de una estacion */
-.popup-content {
+/* .popup-content {
     display: flex;
     justify-content: space-between;
-}
+} */
 
 .text-info {
     color: black; /* Color de texto negro */
@@ -496,13 +496,13 @@ footer {
     margin-left: 10px; /* Espacio entre el texto y la imagen del logo */
 }
 
-.company-name {
-    color: blue; /* Color de texto azul para la empresaBandera */
-}
+/* .company-name {
+    color: blue; 
+} */
 
-.price {
-    color: black; /* Color de texto negro para los precios */
-}
+/* .price {
+    color: black; 
+} */
 
 .marker-circle {
     width: 22px;
@@ -522,84 +522,487 @@ footer {
 }
 
 
-/* ------- LOADING SPINNER -------- */
-/* Loading Overlay para el Mapa */
-#map-loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* =======================================================================================================================================================
+    POPUP - ESTACIONES DE SERVICIO
+   ======================================================================================================================================================= */
+/* Contenedor principal del popup */
+.popup-modern {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-width: 280px;
+    max-width: 320px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Header del popup con logo y nombre de empresa */
+.popup-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.popup-logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.popup-logo img {
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    border-radius: var(--radius);
+    object-fit: contain;
 }
 
-#map-loading-overlay.active {
+.popup-company h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #263248;
+    line-height: 1.3;
+}
+
+/* Divisor visual */
+.popup-divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+}
+
+/* Sección de productos */
+.popup-products {
+    padding: 6px 16px;
+    background: white;
+}
+
+.popup-product-item {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 0;
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.loading-content {
-    text-align: center;
+.popup-product-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
-/* Spinner animado */
-.loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid var(--border-color);
-    border-top: 4px solid var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Barra de progreso */
-.loading-progress {
-    width: 300px;
-    height: 6px;
-    background: var(--border-color);
-    border-radius: 3px;
-    overflow: hidden;
-    margin: 1rem auto;
-}
-
-.loading-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    width: 0%;
-    transition: width 0.3s ease;
-    animation: progressPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes progressPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-.loading-text {
-    color: var(--text-primary);
+.product-name {
+    font-size: 0.95rem;
     font-weight: 600;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.product-name::before {
     font-size: 1rem;
-    margin-top: 0.5rem;
 }
 
-.loading-details {
-    color: var(--text-secondary);
+.product-price {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #263248;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Footer con fecha de actualización */
+.popup-footer {
+    padding: 6px 16px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.popup-update {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 0.875rem;
-    margin-top: 0.25rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.popup-update.status-updated {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 1px solid #86efac;
+}
+
+.popup-update.status-outdated {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.update-icon {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.update-text {
+    flex: 1;
+}
+
+/* Animación de entrada */
+.leaflet-popup {
+    animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilo de la punta del popup */
+.leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    width: auto !important;
+}
+
+.leaflet-popup-tip {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón de cerrar personalizado */
+.leaflet-popup-close-button {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 20px !important;
+    padding: 0 !important;
+    color: #64748b !important;
+    top: 8px !important;
+    right: 8px !important;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.leaflet-popup-close-button:hover {
+    color: #263248 !important;
+    background: #f1f5f9;
+    transform: scale(1.1);
 }
 
 
-/* Responsive */
+.leaflet-routing-container {
+    display: none;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+    .popup-modern {
+        min-width: 260px;
+        max-width: 280px;
+    }
+    
+    .popup-company h3 {
+        font-size: 1rem;
+    }
+    
+    .product-price {
+        font-size: 1rem;
+    }
+}
+
+/* ========================================================================================
+   POPUP MODERNO - PEAJES
+   ======================================================================================== */
+
+/* Contenedor principal del popup de peaje */
+.popup-peaje-modern {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-width: 300px;
+    max-width: 350px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Header con icono de peaje */
+.popup-peaje-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-bottom: 2px solid #10b981;
+}
+
+.popup-peaje-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.popup-peaje-title h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #065f46;
+    line-height: 1.3;
+}
+
+/* Info badges */
+.popup-peaje-info {
+    padding: 4px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #f8fafc;
+}
+
+.info-badge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.info-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #263248;
+}
+
+/* Contenedor de tabla */
+.popup-peaje-table-container {
+    padding: 6px;
+    background: white;
+    overflow-x: auto;
+}
+
+/* Tabla moderna */
+.popup-peaje-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.75rem;
+}
+
+.popup-peaje-table thead {
+    background: linear-gradient(135deg, #263248 0%, #1a2332 100%);
+    color: white;
+}
+
+.popup-peaje-table thead th {
+    padding: 8px 4px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.popup-peaje-table thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.popup-peaje-table thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.popup-peaje-table tbody tr {
+    background: white;
+    transition: all 0.2s;
+}
+
+.popup-peaje-table tbody tr:hover {
+    background: #f8fafc;
+    transform: scale(1.01);
+}
+
+.popup-peaje-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.popup-peaje-table tbody tr:nth-child(even):hover {
+    background: #f1f5f9;
+}
+
+.popup-peaje-table tbody td {
+    padding: 6px 4px;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.popup-peaje-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.popup-peaje-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.popup-peaje-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+/* Estilos específicos de celdas */
+.td-ejes {
+    font-weight: 700;
+    color: #263248;
+    font-size: 0.85rem;
+}
+
+.td-vehiculo {
+    padding: 4px !important;
+}
+
+.vehiculo-img {
+    width: 35px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.td-precio {
+    font-weight: 700;
+    color: #10b981;
+    font-size: 0.8rem;
+}
+
+.td-telepase {
+    font-weight: 700;
+    color: #059669;
+    font-size: 0.8rem;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-radius: 4px;
+}
+
+/* Fila destacada para vehículo seleccionado */
+.vehiculo-destacado {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+    border: 2px solid #10b981 !important;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    position: relative;
+}
+
+.vehiculo-destacado:hover {
+    background: linear-gradient(135deg, #a7f3d0 0%, #86efac 100%) !important;
+    transform: scale(1.02) !important;
+}
+
+.vehiculo-destacado td {
+    border-bottom: 2px solid #10b981 !important;
+    font-weight: 700;
+}
+
+.vehiculo-destacado .td-ejes {
+    color: #065f46;
+    font-size: 0.95rem;
+}
+
+.vehiculo-destacado .td-precio {
+    color: #065f46;
+    font-size: 0.9rem;
+}
+
+.vehiculo-destacado .td-telepase {
+    color: #064e3b;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, #86efac 0%, #6ee7b7 100%);
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+    .popup-modern {
+        min-width: 260px;
+        max-width: 280px;
+    }
+    
+    .popup-company h3 {
+        font-size: 1rem;
+    }
+    
+    .product-price {
+        font-size: 1rem;
+    }
+
+    .popup-peaje-modern {
+        min-width: 320px;
+        max-width: 340px;
+    }
+
+    .popup-peaje-table {
+        font-size: 0.75rem;
+    }
+
+    .popup-peaje-table thead th {
+        padding: 8px 4px;
+        font-size: 0.7rem;
+    }
+
+    .popup-peaje-table tbody td {
+        padding: 8px 4px;
+    }
+
+    .vehiculo-img {
+        width: 40px;
+    }
+
+    .td-precio,
+    .td-telepase {
+        font-size: 0.85rem;
+    }
+}
+
+/* =======================================================================================================================================================
+    RESPONSIVE
+   ======================================================================================================================================================= */
 @media (max-width: 768px) {
     .abrir_menu {
         display: block;

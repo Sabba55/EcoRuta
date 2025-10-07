@@ -33,8 +33,9 @@ document.addEventListener('DOMContentLoaded', function () {
         rangeValue.textContent = newValue.toFixed(1);
     });
     
-
-    // ----------------------------- INICIALIZACIÓN DEL MAPA -----------------------------
+    // ============================================================================================================================
+    // ---------------------------- INICIALIZACIÓN DEL MAPA -----------------------------------
+    // ============================================================================================================================
     const mymap = L.map('mapa').setView([-34.61, -58.38], 3); // Inicializar el mapa
 
     // Capa de azulejos de OpenStreetMap
@@ -91,7 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }    
 
-    // ----------------------------- PRECIOS PROMEDIOS -----------------------------
+    // ============================================================================================================================
+    // ---------------------------------- PRECIOS PROMEDIOS -----------------------------------
+    // ============================================================================================================================
     calcularPreciosPromedioPorProvincia()
     function calcularPreciosPromedioPorProvincia() {
         return fetch('module/SurtiPeaje/precios-en-surtidor-resolucin-3142016.csv') // Devuelve la promesa aquí
@@ -155,7 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
     
-    // ----------------------------- CALCULAR RUTA -----------------------------
+    // ============================================================================================================================
+    // ------------------------------------- CALCULAR RUTA ------------------------------------
+    // ============================================================================================================================
     let puntosSinCombustibleLayer = L.layerGroup().addTo(mymap);
     let provinciasSinCombustible = [];
     let gastoTotalPeajes = 0;
@@ -259,7 +264,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById("index_combust_internacional").textContent = combustibleInternacional 
     }
 
-    
     async function calcularRuta() {
         if (!marcadorOrigen || !marcadorDestino) return;
         try {
@@ -284,92 +288,47 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-
-   // ----------------------------- PEAJES JSON -----------------------------
-    // Lista para almacenar los marcadores de peajes
+    // ============================================================================================================================
+    // ------------------------------------- PEAJES JSON --------------------------------------
+    // ============================================================================================================================
+    
+    // ============== CONFIGURACIÓN Y VARIABLES GLOBALES - PEAJES
     const peajeMarkers = [];
 
-    fetch('module/SurtiPeaje/peajes.geojson')
-        .then(response => response.json())
-        .then(data => {
-            data.features.forEach(feature => {
-                const geometry = feature.geometry;
-                if (!geometry || !geometry.coordinates) {
-                    console.error('Geometría inválida en el feature:', feature);
-                    return;
-                }
+    // Mapeo de vehículos a imágenes y cantidad de ejes
+    const imagenesVehiculos = {
+        "Motocicleta": { imagen: "motocicleta.png", ejes: 2 }, 
+        "2 ejes (tall < 2.10m)": { imagen: "2_ejes_tall_men_2.10m.png", ejes: 2 },
+        "2 ejes (tall > 2.10m)": { imagen: "2_ejes_tall_may_2.10m.png", ejes: 2 },
+        "3 ejes (tall < 2.10m) sin rueda doble": { imagen: "3_ejes_tall_men_2.10m_sin_rueda_doble.png", ejes: 3 },
+        "3 ejes (tall > 2.10m)": { imagen: "3_ejes_tall_may_2.10m.png", ejes: 3 },
+        "4 ejes (tall < 2.10m) sin rueda doble": { imagen: "4_ejes_tall_men_2.10m_sin_rueda_doble.png", ejes: 4 },
+        "4 ejes (tall > 2.10m)": { imagen: "4_ejes_tall_may_2.10m.png", ejes: 4 },
+        "5 ejes": { imagen: "5_ejes.png", ejes: 5 },
+        "6 ejes": { imagen: "6_ejes.png", ejes: 6 },
+        "+6 ejes": { imagen: "+6_ejes.png", ejes: "6+" },
+    };
 
-                let coordinatesList = [];
-                if (geometry.type === "MultiPoint") {
-                    coordinatesList = geometry.coordinates;
-                } else if (geometry.type === "Point") {
-                    coordinatesList = [geometry.coordinates];
-                }
+    // Peajes que requieren una distancia específica (en metros)
+    const peajesConDistanciaEspecial = new Map([
+        ["peaje_dock_sud_vuelta_0005", 25],
+        ["peaje_isla_la_deseada_0008", 39],
+        ["peaje_frontera_puente_libertador_general_san_martin_0015", 1100],
+        ["peaje_frontera_puente_general_artigas_0015", 90],
+        ["ferry_primera_angostura_0016", 25],                  
+    ]);
 
-                coordinatesList.forEach(coord => {
-                    if (coord.length === 2) {
-                        const lat = coord[1];
-                        const lon = coord[0];
+    const distanciaDefault = 9; // Distancia por defecto en metros
 
-                        const peajeIcon = L.divIcon({
-                            className: 'custom-div-icon',
-                            html: '<div style="background-color: green; width: 5px; height: 5px; border-radius: 50%;"></div>',
-                            iconSize: [8, 8],
-                        });
-
-                        const marker = L.marker([lat, lon], { icon: peajeIcon }).addTo(mymap);
-                        marker.bindPopup(generarPopupPeaje(feature));
-
-                        // Agregar el marcador a la lista para su gestión
-                        peajeMarkers.push(marker);
-                    } else {
-                        console.error('Coordenadas inválidas:', coord);
-                    }
-                });
-            });
-
-            // Escuchar eventos de movimiento del mapa para actualizar visibilidad de los peajes
-            mymap.on('moveend', actualizarVisibilidadPeajes);
-        })
-        .catch(error => console.error('Error al cargar el archivo JSON:', error));
-
-    /* Oculta o muestra los peajes según si están dentro de la vista del usuario */
-    function actualizarVisibilidadPeajes() {
-        const bounds = mymap.getBounds(); // Obtener límites visibles del mapa
-
-        peajeMarkers.forEach(marker => {
-            const latLng = marker.getLatLng();
-            if (bounds.contains(latLng)) {
-                marker.setOpacity(1); // Mostrar si está dentro del mapa
-            } else {
-                marker.setOpacity(0); // Ocultar si está fuera del mapa
-            }
-        });
-    }
-
+    // ============== FUNCIÓN DE GENERACIÓN DE POPUP MODERNIZADA
     function generarPopupPeaje(feature) {
         const preciosPeaje = feature.properties.precios_peaje || {};
-
-        // Mapeo de nombres de vehículos a imágenes y cantidad de ejes
-        const imagenesVehiculos = {
-            "Motocicleta": { imagen: "motocicleta.png", ejes: 2 }, 
-            "2 ejes (tall < 2.10m)": { imagen: "2_ejes_tall_men_2.10m.png", ejes: 2 },
-            "2 ejes (tall > 2.10m)": { imagen: "2_ejes_tall_may_2.10m.png", ejes: 2 },
-            "3 ejes (tall < 2.10m) sin rueda doble": { imagen: "3_ejes_tall_men_2.10m_sin_rueda_doble.png", ejes: 3 },
-            "3 ejes (tall > 2.10m)": { imagen: "3_ejes_tall_may_2.10m.png", ejes: 3 },
-            "4 ejes (tall < 2.10m) sin rueda doble": { imagen: "4_ejes_tall_men_2.10m_sin_rueda_doble.png", ejes: 4 },
-            "4 ejes (tall > 2.10m)": { imagen: "4_ejes_tall_may_2.10m.png", ejes: 4 },
-            "5 ejes": { imagen: "5_ejes.png", ejes: 5 },
-            "6 ejes": { imagen: "6_ejes.png", ejes: 6 },
-            "+6 ejes": { imagen: "+6_ejes.png", ejes: "6+" },
-        };
-
-        // Mapa para almacenar las tarifas sin duplicados
         const tarifasAgrupadas = new Map();
 
+        // Agrupar tarifas sin duplicados
         Object.values(preciosPeaje).forEach(tarifa => {
             tarifa.vehiculos.forEach(vehiculo => {
-                if (!imagenesVehiculos[vehiculo]) return; // Ignorar si no hay imagen mapeada
+                if (!imagenesVehiculos[vehiculo]) return;
 
                 if (!tarifasAgrupadas.has(vehiculo)) {
                     tarifasAgrupadas.set(vehiculo, {
@@ -383,140 +342,204 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         return `
-            <div style="font-family: Arial, sans-serif; text-align: center;">
-
-                <!-- Encabezado -->
-                <div style="margin-bottom: 5px;">
-                    <b style="color: green; font-size: 18px;">${feature.properties.ruta.nombre}</b><br>
-                    <b>Empresa:</b> ${feature.properties.empresa}<br>
-                    <b>Tramo:</b> ${feature.properties.ruta.tramo}
+            <div class="popup-peaje-modern">
+                <!-- Header -->
+                <div class="popup-peaje-header">
+                    <div class="popup-peaje-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="popup-peaje-title">
+                        <h3>${feature.properties.ruta.nombre}</h3>
+                    </div>
+                </div>
+                
+                <div class="popup-divider"></div>
+                
+                <!-- Info Cards -->
+                <div class="popup-peaje-info">
+                    <div class="info-badge">
+                        <span class="info-label">Empresa:</span>
+                        <span class="info-value">${feature.properties.empresa}</span>
+                    </div>
+                    <div class="info-badge">
+                        <span class="info-label">Tramo:</span>
+                        <span class="info-value">${feature.properties.ruta.tramo}</span>
+                    </div>
                 </div>
 
                 <!-- Tabla de tarifas -->
-                <div>
-                    <table style="border-collapse: collapse; width: 100%; max-width: 400px; margin: 0 auto; font-size: 12px;">
+                <div class="popup-peaje-table-container">
+                    <table class="popup-peaje-table">
                         <thead>
-                            <tr style="background-color: #d4edda; border: 1px solid #000;">
-                                <th style="padding: 3px; border: 1px solid #000;">Ejes</th>
-                                <th style="padding: 3px; border: 1px solid #000;">Vehículo</th>
-                                <th style="padding: 3px; border: 1px solid #000;">Tarifa</th>
-                                <th style="padding: 3px; border: 1px solid #000;">Telepase</th>
+                            <tr>
+                                <th>Ejes</th>
+                                <th>Vehículo</th>
+                                <th>Tarifa</th>
+                                <th>Telepase</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${Array.from(tarifasAgrupadas.entries()).map(([vehiculo, tarifa]) => `
-                                <tr style="border: 1px solid black; background-color: #f8f9fa;">
-                                    <td style="text-align: center; padding: 3px; border: 1px solid #000;">
-                                        <b>${tarifa.ejes}</b>
-                                    </td>
-                                    <td style="text-align: center; padding: 3px; border: 1px solid #000;">
+                                <tr>
+                                    <td class="td-ejes">${tarifa.ejes}</td>
+                                    <td class="td-vehiculo">
                                         <img src="assets/tarifa_peajes/${tarifa.imagen}" 
-                                            alt="${vehiculo}" style="width: 50px; height: auto; vertical-align: middle;">
+                                            alt="${vehiculo}" class="vehiculo-img">
                                     </td>
-                                    <td style="text-align: center; padding: 3px; border: 1px solid #000;">
-                                        <b>${tarifa.tarifa_basica}</b>
-                                    </td>
-                                    <td style="text-align: center; padding: 3px; border: 1px solid #000;">
-                                        <b>${tarifa.telepase_basico}</b>
-                                    </td>
+                                    <td class="td-precio">${tarifa.tarifa_basica}</td>
+                                    <td class="td-telepase">${tarifa.telepase_basico}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                 </div>
-
             </div>
         `;
     }
 
+    
+    // ============== FUNCIONES DE GESTIÓN DE MARCADORES
+    function crearIconoPeaje() {
+        return L.divIcon({
+            className: 'custom-div-icon',
+            html: '<div style="background-color: green; width: 5px; height: 5px; border-radius: 50%;"></div>',
+            iconSize: [8, 8],
+        });
+    }
 
-    // ----------------------------- DETECTAR PEAJES EN LA RUTA Y CALCULAR COSTO -----------------------------
+    function procesarCoordenadasPeaje(geometry) {
+        let coordinatesList = [];
+        
+        if (geometry.type === "MultiPoint") {
+            coordinatesList = geometry.coordinates;
+        } else if (geometry.type === "Point") {
+            coordinatesList = [geometry.coordinates];
+        }
+        
+        return coordinatesList;
+    }
+
+    function actualizarVisibilidadPeajes() {
+        const bounds = mymap.getBounds();
+
+        peajeMarkers.forEach(marker => {
+            const latLng = marker.getLatLng();
+            if (bounds.contains(latLng)) {
+                marker.setOpacity(1);
+            } else {
+                marker.setOpacity(0);
+            }
+        });
+    }
+
+    // ============== CARGA INICIAL DE PEAJES
+    fetch('module/SurtiPeaje/peajes.geojson')
+        .then(response => response.json())
+        .then(data => {
+            data.features.forEach(feature => {
+                const geometry = feature.geometry;
+                if (!geometry || !geometry.coordinates) {
+                    console.error('Geometría inválida en el feature:', feature);
+                    return;
+                }
+
+                const coordinatesList = procesarCoordenadasPeaje(geometry);
+
+                coordinatesList.forEach(coord => {
+                    if (coord.length === 2) {
+                        const lat = coord[1];
+                        const lon = coord[0];
+
+                        const marker = L.marker([lat, lon], { icon: crearIconoPeaje() }).addTo(mymap);
+                        marker.bindPopup(generarPopupPeaje(feature));
+
+                        peajeMarkers.push(marker);
+                    } else {
+                        console.error('Coordenadas inválidas:', coord);
+                    }
+                });
+            });
+
+            // Escuchar eventos de movimiento del mapa
+            mymap.on('moveend', actualizarVisibilidadPeajes);
+    })
+    .catch(error => console.error('Error al cargar el archivo JSON:', error));
+
+    // ============== DETECCIÓN Y CÁLCULO DE PEAJES EN RUTA
     async function detectarPeajesEnRuta(ruta) {
         try {
             const response = await fetch('module/SurtiPeaje/peajes.geojson');
             const data = await response.json();
-    
+
             let peajesContador = new Map();
             let costoTotalPeajesEfectivo = 0;
             let costoTotalPeajesTelepase = 0;
-    
+
+            // Obtener categoría del vehículo
             const vehiculoCategoria = localStorage.getItem("clasificacion") === "No clasificado" 
                 ? "2 ejes (tall < 2.30m)(tall < 2.10m)" 
                 : localStorage.getItem("clasificacion");
 
-            // document.getElementById("index_vehiculo").textContent = vehiculoCategoria;
-    
-            const distanciaDefault = 9; // Distancia por defecto
-    
-            // Peajes que requieren una distancia específica
-            const peajesConDistanciaEspecial = new Map([
-                ["peaje_dock_sud_vuelta_0005", 25],
-                ["peaje_isla_la_deseada_0008", 39],
-                ["peaje_frontera_puente_libertador_general_san_martin_0015", 1100],
-                ["peaje_frontera_puente_general_artigas_0015", 90],
-                ["ferry_primera_angostura_0016", 25],                  
-            ]);
-    
             let deteccionesPeajes = new Map();
-    
+
+            // Validar que la ruta tenga coordenadas válidas
             if (!Array.isArray(ruta.coordinates) || ruta.coordinates.length === 0) {
                 console.error("Error: La ruta no tiene coordenadas válidas.", ruta.coordinates);
                 return;
             }
-    
+
+            // Procesar cada peaje del GeoJSON
             data.features.forEach(feature => {
                 const geometry = feature.geometry;
                 if (!geometry || !geometry.coordinates) return;
-    
-                let coordenadasPeaje = [];
-    
-                if (geometry.type === 'Point') {
-                    coordenadasPeaje.push(geometry.coordinates);
-                } else if (geometry.type === 'MultiPoint') {
-                    coordenadasPeaje = geometry.coordinates;
-                }
-    
+
+                const coordenadasPeaje = procesarCoordenadasPeaje(geometry);
                 const peajeID = feature.id;
-                const distanciaMaxima = peajesConDistanciaEspecial.get(peajeID) || distanciaDefault; // Asigna distancia según ID
-    
+                const distanciaMaxima = peajesConDistanciaEspecial.get(peajeID) || distanciaDefault;
+
                 coordenadasPeaje.forEach(coord => {
                     if (!Array.isArray(coord) || coord.length < 2) {
                         console.warn("⚠️ Coordenadas de peaje inválidas:", coord);
                         return;
                     }
-    
+
                     const peajeLatLng = L.latLng(coord[1], coord[0]);
                     const nombrePeaje = feature.properties.ruta.nombre;
                     const idEmpresa = feature.properties.idempresa;
                     const identificadorCasilla = `${nombrePeaje}-${coord[1]},${coord[0]}`;
-    
-                    // Verificar si el usuario tiene Telepase activado para esta empresa
+
+                    // Verificar si el usuario tiene Telepase para esta empresa
                     const tieneTelepase = localStorage.getItem(idEmpresa) === "true";
-    
+
+                    // Verificar proximidad con cada punto de la ruta
                     ruta.coordinates.forEach((coordRuta, index) => {
                         if (!coordRuta || typeof coordRuta.lat !== 'number' || typeof coordRuta.lng !== 'number') {
                             console.warn("⚠️ Coordenada de ruta inválida:", coordRuta);
                             return;
                         }
-    
+
                         const rutaLatLng = L.latLng(coordRuta.lat, coordRuta.lng);
+                        
                         if (rutaLatLng.distanceTo(peajeLatLng) <= distanciaMaxima) {
                             if (!deteccionesPeajes.has(identificadorCasilla)) {
                                 deteccionesPeajes.set(identificadorCasilla, []);
                             }
-    
+
                             const registros = deteccionesPeajes.get(identificadorCasilla);
+                            
+                            // Evitar duplicados cercanos (más de 5 puntos de separación)
                             if (registros.length === 0 || index - registros[registros.length - 1] > 5) {
                                 registros.push(index);
                                 peajesContador.set(identificadorCasilla, (peajesContador.get(identificadorCasilla) || 0) + 1);
-    
+
+                                // Calcular tarifa según vehículo
                                 const tarifas = feature.properties.precios_peaje;
                                 for (const tarifaKey in tarifas) {
                                     if (tarifas[tarifaKey].vehiculos.includes(vehiculoCategoria)) {
                                         let tarifaAplicada = tieneTelepase 
                                             ? tarifas[tarifaKey].telepase_basico ?? tarifas[tarifaKey].tarifa_basica 
                                             : tarifas[tarifaKey].tarifa_basica;
-    
+
                                         if (tieneTelepase && tarifas[tarifaKey].telepase_basico !== undefined) {
                                             costoTotalPeajesTelepase += tarifaAplicada;
                                         } else {
@@ -530,31 +553,163 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 });
             });
-    
+
+            // Actualizar resultados en el DOM
             document.getElementById("resultado-total-peajes-efectivo").textContent = `$ ${costoTotalPeajesEfectivo.toFixed(2)}`;
             document.getElementById("resultado-total-peajes-telepase").textContent = `$ ${costoTotalPeajesTelepase.toFixed(2)}`;
-    
+
             console.log(`✅ Cantidad de peajes en la ruta: ${peajesContador.size}`);
             console.log(`✅ Peajes atravesados:`, peajesContador);
             console.log(`✅ Costo total de peajes en efectivo para ${vehiculoCategoria}: $${costoTotalPeajesEfectivo}`);
             console.log(`✅ Costo total de peajes con Telepase para ${vehiculoCategoria}: $${costoTotalPeajesTelepase}`);
 
             gastoTotalPeajes = parseFloat(costoTotalPeajesEfectivo) + parseFloat(costoTotalPeajesTelepase);
-    
+
+            // Generar detalle de peajes
             let resultadoPeajes = "";
             peajesContador.forEach((count, peaje) => {
                 resultadoPeajes += `<p>${peaje}: ${count} veces</p>`;
             });
             document.getElementById("detalle-peajes").innerHTML = resultadoPeajes;
+            
         } catch (error) {
             console.error('❌ Error al detectar peajes en la ruta:', error);
         }
     }
     
+    // ============================================================================================================================
+    // ----------------------- CARGAR ESTACIONES DE SERVICIOS CSV -----------------------------    
+    // ============================================================================================================================
 
-    // ----------------------------- CARGAR ESTACIONES DE SERVICIOS CSV -----------------------------    
+    // ============== CONFIGURACIÓN Y VARIABLES GLOBALES 
     let markerCluster;
 
+    // Configuración de logos de empresas
+    const companyLogoPaths = {
+        'AXION': 'assets/logo_estaciones/axion.png',
+        'DAPSA S.A.': 'assets/logo_estaciones/dapsa.png',
+        'YPF': 'assets/logo_estaciones/ypf.png',
+        'GULF': 'assets/logo_estaciones/gulf.png',
+        'PUMA': 'assets/logo_estaciones/puma.png',
+        'REFINOR': 'assets/logo_estaciones/refinor.png',
+        'SHELL C.A.P.S.A.': 'assets/logo_estaciones/shell.png',
+        'VOY': 'assets/logo_estaciones/voy.png',
+        'BLANCA': 'assets/logo_estaciones/cualquier_otro_nombre.png',
+    };
+
+    // Mapeo de nombres de productos
+    const productMap = {
+        'Gas Oil Grado 2': 'Diesel Comun',
+        'Gas Oil Grado 3': 'Diesel Premium',
+        'Nafta (premium) de más de 95 Ron': 'Nafta Premium',
+        'Nafta (súper) entre 92 y 95 Ron': 'Nafta Super',
+        'GNC': 'GNC'
+    };
+
+    // Orden de visualización de productos
+    const productOrder = ['Nafta Super', 'Nafta Premium', 'Diesel Comun', 'Diesel Premium', 'GNC'];
+
+    // ============== FUNCIONES AUXILIARES - AGRUPACIÓN Y VALIDACIÓN 
+    function agruparPorDireccion(data) {
+        return data.reduce((groups, row) => {
+            const address = row.direccion;
+            if (!groups[address]) groups[address] = [];
+            groups[address].push(row);
+            return groups;
+        }, {});
+    }
+
+    function validarCoordenadas(stations) {
+        return !stations.some(({ latitud, longitud }) => isNaN(parseFloat(latitud)) || isNaN(parseFloat(longitud)));
+    }
+
+    function calcularCoordenadasPromedio(stations) {
+        const avg = (values) => values.reduce((acc, val) => acc + parseFloat(val), 0) / values.length;
+        return {
+            lat: avg(stations.map(({ latitud }) => latitud)),
+            lng: avg(stations.map(({ longitud }) => longitud)),
+        };
+    }
+
+    // ============== FUNCIONES DE CREACIÓN DE ELEMENTOS DEL MAPA 
+    function crearMarkerCluster() {
+        return L.markerClusterGroup({
+            iconCreateFunction: (cluster) => L.divIcon({
+                html: `<div class="marker-cluster-custom">${cluster.getChildCount()}</div>`,
+                className: 'marker-cluster-custom',
+                iconSize: L.point(30, 30),
+            }),
+        });
+    }
+
+    function crearIconoPersonalizado() {
+        return L.divIcon({
+            className: 'custom-marker-icon',
+            html: '<div class="marker-circle"><strong><i class="bi bi-fuel-pump"></i></div>',
+            iconSize: [20, 20],
+        });
+    }
+
+    // ============== FUNCIONES DE FORMATO Y PRESENTACIÓN 
+    function formatearFechaVigencia(stations) {
+        const latest = stations.reduce((latest, current) => {
+            return new Date(latest.fecha_vigencia) > new Date(current.fecha_vigencia) ? latest : current;
+        }).fecha_vigencia;
+
+        const formattedFecha = latest.split(' ')[0].split('-').reverse().join('-');
+        const fechaActualizacion = new Date(latest);
+        const fechaLimite = new Date('2025-08-30');
+
+        const statusClass = fechaActualizacion < fechaLimite ? 'status-outdated' : 'status-updated';
+        const statusIcon = fechaActualizacion < fechaLimite ? '⚠️' : '✓';
+        
+        return `
+            <div class="popup-update ${statusClass}">
+                <span class="update-icon">${statusIcon}</span>
+                <span class="update-text">Actualización: ${formattedFecha}</span>
+            </div>`;
+    }
+
+    function crearPopupContent(empresaBandera, stations) {
+        const addedProducts = new Set();
+        let popupContent = `
+            <div class="popup-modern">
+                <div class="popup-header">
+                    <div class="popup-logo">
+                        <img src="${companyLogoPaths[empresaBandera]}" alt="Logo ${empresaBandera}" width="40" height="40">
+                    </div>
+                    <div class="popup-company">
+                        <h3>${empresaBandera}</h3>
+                    </div>
+                </div>
+                <div class="popup-divider"></div>
+                <div class="popup-products">`;
+
+        productOrder.forEach(product => {
+            stations.forEach(station => {
+                const productName = productMap[station.producto] || station.producto;
+                if (productName === product && !addedProducts.has(productName)) {
+                    popupContent += `
+                        <div class="popup-product-item">
+                            <span class="product-name">${productName}</span>
+                            <span class="product-price">${station.precio}</span>
+                        </div>`;
+                    addedProducts.add(productName);
+                }
+            });
+        });
+
+        const fechaVigencia = formatearFechaVigencia(stations);
+        popupContent += `
+                </div>
+                <div class="popup-footer">
+                    ${fechaVigencia}
+                </div>
+            </div>`;
+        return popupContent;
+    }
+
+    // ============== FUNCIÓN PRINCIPAL - CARGAR TODAS LAS ESTACIONES 
     function cargarEstacionesServicio() {
         return new Promise((resolve, reject) => {
             fetch('module/SurtiPeaje/precios-en-surtidor-resolucin-3142016.csv')
@@ -588,301 +743,153 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function agruparPorDireccion(data) {
-        return data.reduce((groups, row) => {
-            const address = row.direccion;
-            if (!groups[address]) groups[address] = [];
-            groups[address].push(row);
-            return groups;
-        }, {});
-    }
-
-    function validarCoordenadas(stations) {
-        return !stations.some(({ latitud, longitud }) => isNaN(parseFloat(latitud)) || isNaN(parseFloat(longitud)));
-    }
-
-    function calcularCoordenadasPromedio(stations) {
-        const avg = (values) => values.reduce((acc, val) => acc + parseFloat(val), 0) / values.length;
-        return {
-            lat: avg(stations.map(({ latitud }) => latitud)),
-            lng: avg(stations.map(({ longitud }) => longitud)),
-        };
-    }
-
-    function crearMarkerCluster() {
-        return L.markerClusterGroup({
-            iconCreateFunction: (cluster) => L.divIcon({
-                html: `<div class="marker-cluster-custom">${cluster.getChildCount()}</div>`,
-                className: 'marker-cluster-custom',
-                iconSize: L.point(30, 30),
-            }),
-        });
-    }
-
-    function crearIconoPersonalizado() {
-        return L.divIcon({
-            className: 'custom-marker-icon',
-            html: '<div class="marker-circle"><strong>E</div>',
-            iconSize: [20, 20],
-        });
-    }
-
-    function crearPopupContent(empresaBandera, stations) {
-        const companyLogoPaths = {
-            'AXION': 'assets/logo_estaciones/axion.png',
-            'DAPSA S.A.': 'assets/logo_estaciones/dapsa.png',
-            'YPF': 'assets/logo_estaciones/ypf.png',
-            'GULF': 'assets/logo_estaciones/gulf.png',
-            'PUMA': 'assets/logo_estaciones/puma.png',
-            'REFINOR': 'assets/logo_estaciones/refinor.png',
-            'SHELL C.A.P.S.A.': 'assets/logo_estaciones/shell.png',
-            'VOY': 'assets/logo_estaciones/voy.png',
-            'BLANCA': 'assets/logo_estaciones/cualquier_otro_nombre.png',
-        };
-
-        const productOrder = ['Nafta Super', 'Nafta Premium', 'Diesel Comun', 'Diesel Premium', 'GNC'];
-        const productMap = {
-            'Gas Oil Grado 2': 'Diesel Comun',
-            'Gas Oil Grado 3': 'Diesel Premium',
-            'Nafta (premium) de más de 95 Ron': 'Nafta Premium',
-            'Nafta (súper) entre 92 y 95 Ron': 'Nafta Super',
-        };
-
+    // ============== FUNCIÓN AUXILIAR - CREAR POPUP FILTRADO POR TIPO DE COMBUSTIBLE 
+    function crearPopupContentFiltrado(empresaBandera, stations, tipoCombustible) {
         const addedProducts = new Set();
-        let popupContent = `<div class="popup-content"><div><b class="company-name">${empresaBandera}</b><br>`;
+        let popupContent = `
+            <div class="popup-modern">
+                <div class="popup-header">
+                    <div class="popup-logo">
+                        <img src="${companyLogoPaths[empresaBandera]}" alt="Logo ${empresaBandera}" width="40" height="40">
+                    </div>
+                    <div class="popup-company">
+                        <h3>${empresaBandera}</h3>
+                    </div>
+                </div>
+                <div class="popup-divider"></div>
+                <div class="popup-products">`;
 
-        productOrder.forEach(product => {
-            stations.forEach(station => {
-                const productName = productMap[station.producto] || station.producto;
-                if (productName === product && !addedProducts.has(productName)) {
-                    popupContent += `<b>${productName}</b>: $<span class="price">${station.precio}</span><br>`;
-                    addedProducts.add(productName);
-                }
-            });
-        });
+        // Agregar productos filtrados
+        stations.forEach(station => {
+            let productName = '';
+            let realProduct = '';
+            
+            switch (station.producto) {
+                case 'Gas Oil Grado 2':
+                    realProduct = "Gas Oil Grado 2";
+                    productName = 'Gasoil Diesel';
+                    break;
+                case 'Gas Oil Grado 3':
+                    realProduct = "Gas Oil Grado 3";
+                    productName = 'Gasoil Premium';
+                    break;
+                case 'Nafta (premium) de más de 95 Ron':
+                    realProduct = "Nafta (premium) de más de 95 Ron";
+                    productName = 'Nafta Premium';
+                    break;
+                case 'Nafta (súper) entre 92 y 95 Ron':
+                    realProduct = "Nafta (súper) entre 92 y 95 Ron";
+                    productName = 'Nafta Super';
+                    break;
+                case 'GNC':
+                    realProduct = "GNC";
+                    productName = 'GNC';
+                    break;
+                default:
+                    productName = station.producto;
+            }
 
-        const fechaVigencia = formatearFechaVigencia(stations);
-        popupContent += fechaVigencia;
-        popupContent += `
-            </div>
-            <div class="logo_edes" style="display: flex; justify-content: center; align-items: center;">
-                <img src="${companyLogoPaths[empresaBandera]}" alt="Logo de la estación" width="50" height="50">
-            </div>
-        </div>`;
-        return popupContent;
-    }
-
-    function formatearFechaVigencia(stations) {
-        const latest = stations.reduce((latest, current) => {
-            return new Date(latest.fecha_vigencia) > new Date(current.fecha_vigencia) ? latest : current;
-        }).fecha_vigencia;
-
-        const formattedFecha = latest.split(' ')[0].split('-').reverse().join('-');
-        const fechaActualizacion = new Date(latest);
-        const fechaLimite = new Date('2024-12-30');
-
-        const color = fechaActualizacion < fechaLimite ? 'red' : 'black';
-        return `<br><b><span style="color: ${color};">Actualización:</span></b> ${formattedFecha}<br>`;
-    }
-
-    // Llamamos a la función para cargar las estaciones de servicio y obtenemos el objeto markerCluster
-    cargarEstacionesServicio()
-        .then(cluster => {
-            // Guardamos el objeto markerCluster en la variable global
-            markerCluster = cluster;
-        })
-        .catch(error => {
-            // Manejamos cualquier error que ocurra durante la carga de las estaciones de servicio
-            console.error('Error al cargar las estaciones de servicio:', error);
-        });
-
-    // Función para cargar las estaciones de servicio según el tipo de combustible seleccionado
-    function cargarEstacionesPorTipo(tipoCombustible) {
-        console.log(`Cargando estaciones por tipo de combustible: ${tipoCombustible}`);
-    
-        return new Promise((resolve, reject) => {
-
-        // Limpiar los marcadores y grupo de marcadores del mapa
-        if (markerCluster) {
-            mymap.removeLayer(markerCluster);
-        }
-        
-        // Crear un nuevo grupo de marcadores
-        markerCluster = L.markerClusterGroup({
-            iconCreateFunction: function (cluster) {
-                return L.divIcon({
-                    html: `<div class="marker-cluster-custom">${cluster.getChildCount()}</div>`,
-                    className: 'marker-cluster-custom',
-                    iconSize: L.point(30, 30), // Tamaño del icono del marcador
-                });
+            if (!addedProducts.has(productName) && realProduct === tipoCombustible) {
+                popupContent += `
+                    <div class="popup-product-item">
+                        <span class="product-name">${productName}</span>
+                        <span class="product-price">${station.precio}</span>
+                    </div>`;
+                addedProducts.add(productName);
             }
         });
 
-        fetch('module/SurtiPeaje/precios-en-surtidor-resolucin-3142016.csv')
-            .then(response => response.text())
-            .then(csvData => {
-                const parsedData = Papa.parse(csvData, { header: true }).data;
+        // ============== FUNCIÓN SECUNDARIA - CARGAR ESTACIONES POR TIPO DE COMBUSTIBLE ==============
+        // Agregar fecha de vigencia
+        const latestFechaVigencia = stations.reduce((latest, current) => {
+            return latest.fecha_vigencia > current.fecha_vigencia ? latest : current;
+        }).fecha_vigencia;
 
-                // Filtrar las estaciones por tipo de combustible seleccionado
-                const filteredStations = parsedData.filter(station => station.producto === tipoCombustible);
+        const fechaPart = latestFechaVigencia.split(' ')[0];
+        const parts = fechaPart.split('-');
+        const formattedFechaVigencia = `${parts[2]}-${parts[1]}-${parts[0]}`;
 
-                // Objeto para almacenar las estaciones agrupadas por dirección
-                const stationsByAddress = {};
+        const fechaLimite = new Date('2025-08-30');
+        const fechaActualizacion = new Date(latestFechaVigencia);
 
-                // Agrupar las estaciones por dirección
-                filteredStations.forEach(row => {
-                    const address = row.direccion;
-                    if (!stationsByAddress[address]) {
-                        stationsByAddress[address] = [];
-                    }
-                    stationsByAddress[address].push(row);
-                });
+        const statusClass = fechaActualizacion < fechaLimite ? 'status-outdated' : 'status-updated';
+        const statusIcon = fechaActualizacion < fechaLimite ? '⚠️' : '✓';
 
-                // Objeto para mapear empresaBandera a la ruta de la imagen del logo
-                const companyLogoPaths = {
-                    'AXION': 'assets/logo_estaciones/axion.png',
-                    'DAPSA S.A.': 'assets/logo_estaciones/dapsa.png',
-                    'YPF': 'assets/logo_estaciones/ypf.png',
-                    'GULF': 'assets/logo_estaciones/gulf.png',
-                    'PUMA': 'assets/logo_estaciones/puma.png',
-                    'REFINOR': 'assets/logo_estaciones/refinor.png',
-                    'SHELL C.A.P.S.A.': 'assets/logo_estaciones/shell.png',
-                    'VOY': 'assets/logo_estaciones/voy.png',
-                    'BLANCA': 'assets/logo_estaciones/cualquier_otro_nombre.png'
-                };
+        popupContent += `
+                </div>
+                <div class="popup-footer">
+                    <div class="popup-update ${statusClass}">
+                        <span class="update-icon">${statusIcon}</span>
+                        <span class="update-text">Actualización: ${formattedFechaVigencia}</span>
+                    </div>
+                </div>
+            </div>`;
+        
+        return popupContent;
+    }
 
-                // Crear icono personalizado para los marcadores
-                const customIcon = L.divIcon({
-                    className: 'custom-marker-icon',
-                    html: '<div class="marker-circle"><strong>E</div>',
-                    iconSize: [20, 20], // Tamaño del icono
-                });
+    function cargarEstacionesPorTipo(tipoCombustible) {
+        console.log(`Cargando estaciones por tipo de combustible: ${tipoCombustible}`);
 
-                // Crear marcadores para cada dirección
-                Object.keys(stationsByAddress).forEach(address => {
-                    const stations = stationsByAddress[address];
-                    const latitudes = stations.map(station => parseFloat(station.latitud));
-                    const longitudes = stations.map(station => parseFloat(station.longitud));
+        return new Promise((resolve, reject) => {
+            // Limpiar marcadores existentes
+            if (markerCluster) {
+                mymap.removeLayer(markerCluster);
+            }
+            
+            // Crear nuevo grupo de marcadores
+            markerCluster = crearMarkerCluster();
 
-                    // Verificar si hay valores de latitud o longitud que no son números válidos
-                    if (latitudes.some(isNaN) || longitudes.some(isNaN)) {
-                        console.error('Error: Valores de latitud o longitud no válidos para la dirección:', address);
-                        return; // Salir del bucle para esta dirección si hay valores no válidos
-                    }
+            fetch('module/SurtiPeaje/precios-en-surtidor-resolucin-3142016.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    const parsedData = Papa.parse(csvData, { header: true }).data;
 
-                    // Tomar el promedio de las coordenadas para colocar el marcador en el centro de las estaciones
-                    const avgLatitude = latitudes.reduce((acc, curr) => acc + curr, 0) / latitudes.length;
-                    const avgLongitude = longitudes.reduce((acc, curr) => acc + curr, 0) / longitudes.length;
+                    // Filtrar por tipo de combustible
+                    const filteredStations = parsedData.filter(station => station.producto === tipoCombustible);
+                    const stationsByAddress = agruparPorDireccion(filteredStations);
 
-                    // Crear marcador para la empresa
-                    const marker = L.marker([avgLatitude, avgLongitude], { icon: customIcon });
-
-                    // Personalizar marcador con información relevante
-                    let popupContent = `
-                        <div class="popup-content">
-                            <div>
-                                <b class="company-name">${stations[0].empresabandera}</b><br>
-                    `;
-
-                // Crear un conjunto para realizar un seguimiento de los productos agregados al popup
-                const addedProducts = new Set();
-
-                    // Agregar los productos al popup (sin ordenar)
-                    stations.forEach(station => {
-                        let productName = '';
-                        switch (station.producto) {
-                            case 'Gas Oil Grado 2':
-                                realProduct = "Gas Oil Grado 2"
-                                productName = 'Gasoil Diesel';
-                                break;
-                            case 'Gas Oil Grado 3':
-                                realProduct = "Gas Oil Grado 3"
-                                productName = 'Gasoil Premium';
-                                break;
-                            case 'Nafta (premium) de más de 95 Ron':
-                                realProduct = "Nafta (premium) de más de 95 Ron"
-                                productName = 'Nafta Premium';
-                                break;
-                            case 'Nafta (súper) entre 92 y 95 Ron':
-                                realProduct = "Nafta (súper) entre 92 y 95 Ron"
-                                productName = 'Nafta Super';
-                                break;
-                            case 'GNC':
-                                realProduct = "GNC"
-                                productName = 'GNC';
-                                break;
-                            default:
-                                productName = station.producto;
+                    // Crear marcadores para cada dirección
+                    Object.keys(stationsByAddress).forEach(address => {
+                        const stations = stationsByAddress[address];
+                        
+                        if (!validarCoordenadas(stations)) {
+                            console.error('Error: Valores de latitud o longitud no válidos para la dirección:', address);
+                            return;
                         }
 
-                        // Verificar si el producto ya ha sido agregado al popup
-                        if (!addedProducts.has(productName) && realProduct === tipoCombustible) {
-                            popupContent += `<b>${productName}</b>: $<span class="price">${station.precio}</span><br>`;
-                            // Agregar el producto al conjunto para evitar agregarlo nuevamente
-                            addedProducts.add(productName);
-                        }
+                        const { lat: avgLatitude, lng: avgLongitude } = calcularCoordenadasPromedio(stations);
+                        const empresaBandera = stations[0].empresabandera;
+                        const popupContent = crearPopupContentFiltrado(empresaBandera, stations, tipoCombustible);
+                        
+                        const marker = L.marker([avgLatitude, avgLongitude], { icon: crearIconoPersonalizado() });
+                        marker.bindPopup(popupContent);
+                        markerCluster.addLayer(marker);
                     });
 
-                    // Mostrar el dato de fecha_vigencia más reciente para esta empresa
-                    const latestFechaVigencia = stations.reduce((latest, current) => {
-                        return latest.fecha_vigencia > current.fecha_vigencia ? latest : current;
-                    }).fecha_vigencia;
-
-                    // Obtener solo la parte de la fecha (yyyy-mm-dd)
-                    const fechaPart = latestFechaVigencia.split(' ')[0];
-
-                    // Dividir la fecha en partes (año, mes, día)
-                    const parts = fechaPart.split('-');
-                    const formattedFechaVigencia = `${parts[2]}-${parts[1]}-${parts[0]}`; // Reordenar y formatear la fecha
-
-                    // Fecha límite
-                    const fechaLimite = new Date('2024-01-30');
-
-                    // Convertir la fecha de actualización a un objeto Date
-                    const fechaActualizacion = new Date(latestFechaVigencia);
-
-                    // Verificar si la fecha de actualización es anterior a la fecha límite
-                    if (fechaActualizacion.getTime() < fechaLimite.getTime()) {
-                        // Si es anterior, agregar estilo CSS para color rojo
-                        popupContent += `
-                            <br>
-                            <b><span style="color: red;">Actualización:</span></b> ${formattedFechaVigencia}<br>
-                        `;
-                    } else {
-                        // Si no, mantener el estilo actual (negro)
-                        popupContent += `
-                            <br>
-                            <b>Actualización:</b> ${formattedFechaVigencia}<br>
-                        `;
-                    }
-
-                    // Continuar con la construcción del contenido del popup
-                    popupContent += `
-                        </div>
-                            <div class="logo_edes" style="display: flex; justify-content: center; align-items: center;">
-                                <img src="${companyLogoPaths[stations[0].empresabandera]}" alt="Logo de la estación" width="50" height="50">
-                            </div>
-                        </div>
-                    `;
-
-                    // Agregar el popup al marcador
-                    marker.bindPopup(popupContent);
-
-                    // Agregar marcador al grupo de marcadores agrupados
-                    markerCluster.addLayer(marker);
+                    mymap.addLayer(markerCluster);
+                    resolve(markerCluster);
+                })
+                .catch(error => {
+                    console.error('Error al cargar el archivo CSV de estaciones de servicio:', error);
+                    reject(error);
                 });
-
-                // Agregar grupo de marcadores al mapa
-                mymap.addLayer(markerCluster);
-
-                resolve(markerCluster); //-------------------
-            })
-            .catch(error => {console.error('Error al cargar el archivo CSV de estaciones de servicio:', error)});
         });
     }
 
+    // ============== INICIALIZACIÓN 
+    cargarEstacionesServicio()
+        .then(cluster => {
+            markerCluster = cluster;
+        })
+        .catch(error => {
+            console.error('Error al cargar las estaciones de servicio:', error);
+        });
 
-    // ----------------------------- ENVÍO DEL FORMULARIO -----------------------------
+
+    // ============================================================================================================================
+    // --------------------------------- ENVÍO DEL FORMULARIO ---------------------------------
+    // ============================================================================================================================
     const formularioViaje = document.getElementById('formulario-viaje');
     const mapaSection = document.getElementById("mapa");
     formularioViaje.addEventListener('submit', function (event) {
