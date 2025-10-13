@@ -311,7 +311,7 @@ header {
 /* Map Section */
 #mapa {
     width: 100%;
-    height: 600px;
+    height: 500px;
     border-radius: var(--radius);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
@@ -328,7 +328,7 @@ header {
 
 .result-card {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: var(--radius);
     border: 2px solid var(--border-color);
     transition: all 0.3s;
@@ -997,6 +997,343 @@ footer {
     .td-precio,
     .td-telepase {
         font-size: 0.85rem;
+    }
+}
+
+/* ============================================================
+   POPUP DE COMBUSTIBLE - PUNTOS DE CARGA
+   ============================================================ */
+
+/* Contenedor principal del popup de combustible */
+.popup-combustible-modern {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-width: 360px;
+    max-width: 380px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Header con alerta */
+.popup-combustible-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+}
+
+.popup-alerta-icon {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.popup-alerta-icon i {
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.popup-alerta-title h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.3;
+}
+
+/* Información del recorrido */
+.popup-combustible-info {
+    padding: 4px 16px;
+    background: #f8fafc;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.info-row:not(:last-child) {
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.info-row .info-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.info-row .info-label i {
+    font-size: 16px;
+    color: #ff6b35;
+}
+
+.info-row .info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #263248;
+    background: #ffffff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Sección de estaciones cercanas */
+.popup-estaciones-section {
+    padding: 4px 10px;
+}
+
+.estaciones-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #263248;
+    text-align: center;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ff6b35;
+}
+
+/* Contenedor de tabla de estaciones */
+.popup-estaciones-table-container {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Tabla de estaciones */
+.popup-estaciones-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+    font-size: 12px;
+}
+
+.popup-estaciones-table thead {
+    background: linear-gradient(135deg, #263248 0%, #1a2332 100%);
+}
+
+.popup-estaciones-table thead th {
+    padding: 10px 8px;
+    text-align: center;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.popup-estaciones-table thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.popup-estaciones-table thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.popup-estaciones-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.popup-estaciones-table tbody tr:hover {
+    background-color: #f8fafc;
+    transform: scale(1.01);
+}
+
+.popup-estaciones-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.popup-estaciones-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.popup-estaciones-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.popup-estaciones-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+.popup-estaciones-table tbody td {
+    padding: 12px 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Columnas específicas */
+.td-logo {
+    width: 50px;
+}
+
+.estacion-logo {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #f8fafc;
+    padding: 4px;
+}
+
+.td-localidad {
+    font-weight: 500;
+    color: #475569;
+    text-align: left;
+    font-size: 12px;
+}
+
+.td-precio {
+    font-weight: 700;
+    color: #10b981;
+    font-size: 13px;
+}
+
+.td-ubicacion {
+    width: 50px;
+}
+
+/* Botón de ubicación */
+.btn-ubicacion {
+    background: linear-gradient(135deg, #263248 0%, #1a2332 100%);
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(38, 50, 72, 0.3);
+}
+
+.btn-ubicacion:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(38, 50, 72, 0.5);
+    background: linear-gradient(135deg, #1a2332 0%, #263248 100%);
+}
+
+.btn-ubicacion:active {
+    transform: translateY(0);
+}
+
+.btn-ubicacion i {
+    font-size: 14px;
+}
+
+/* Ajustes para el popup de Leaflet */
+.custom-popup-combustible .leaflet-popup-content-wrapper {
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.custom-popup-combustible .leaflet-popup-content {
+    margin: 0;
+    width: auto !important;
+}
+
+.custom-popup-combustible .leaflet-popup-tip {
+    background: #ffffff;
+}
+
+/* Botón de cerrar personalizado para popup de combustible */
+.custom-popup-combustible .leaflet-popup-close-button {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 20px !important;
+    padding: 0 !important;
+    color: #64748b !important;
+    top: 8px !important;
+    right: 8px !important;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.custom-popup-combustible .leaflet-popup-close-button:hover {
+    color: #ff6b35 !important;
+    background: #fef2f2;
+    transform: scale(1.1);
+}
+
+.fuel-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.fuel-icon i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .popup-combustible-modern {
+        min-width: 300px;
+        max-width: 320px;
+    }
+    
+    .popup-alerta-title h3 {
+        font-size: 13px;
+    }
+    
+    .popup-estaciones-table {
+        font-size: 11px;
+    }
+
+    .popup-estaciones-table thead th {
+        padding: 8px 6px;
+        font-size: 10px;
+    }
+
+    .popup-estaciones-table tbody td {
+        padding: 10px 6px;
+    }
+    
+    .estacion-logo {
+        width: 30px;
+        height: 30px;
+    }
+
+    .td-localidad {
+        font-size: 11px;
+    }
+
+    .td-precio {
+        font-size: 12px;
+    }
+
+    .btn-ubicacion {
+        width: 28px;
+        height: 28px;
+    }
+
+    .btn-ubicacion i {
+        font-size: 12px;
     }
 }
 

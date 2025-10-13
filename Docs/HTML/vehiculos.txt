@@ -1,0 +1,167 @@
+CAMBIOS REALIZADOS EL 01/10/25
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/style.css">
+
+        <!-- mini logo -->
+        <link rel="shortcut icon" href="./assets/logo_grande.png" type="image/x-icon">
+
+        <!-- Incluye Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Incluye el CSS de Leaflet -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+
+        <!-- Incluye el CSS de Leaflet Routing Machine -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+        <!-- Incluye Leaflet -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+        <!-- Incluye Leaflet Routing Machine -->
+        <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+        <!-- Incluye Leaflet Control Geocoder -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.0/leaflet.markercluster.js"></script>
+
+
+        <title>EcoRuta - Vehiculos</title>
+    </head>
+
+    <body>
+        <header id="header">
+            <div id="logo">
+                <a href="/index.html">
+                    <img src="/assets/logo_grande.png" alt="EcoRuta">
+                </a>
+            </div>
+            <button id="abrir_hamburguesa" class="abrir_menu"><i class="bi bi-list"></i></button>
+            <nav class="nav" id="nav">
+                <button id="cerrar_hamburguesa" class="cerrar_menu"><i class="bi bi-x-lg"></i></button>
+                <ul class="nav-list">
+                    <li><a href="/index.html">Inicio</a></li>
+                    <li><a href="./guia_uso.html">Guía de Uso</a></li>
+                    <li><a href="./vehiculos.html">Vehiculos</a></li>
+                    <li><a href="./configuracion.html">Configuracion</a></li>
+                    <li><a href="./nosotros.html">Nosotros</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="vehiculos_container">
+                <form id="form-configuracion">
+                    <h2 class="color_azul centrado_automatico">Selecciona los detalles de tu vehículo</h2>
+
+                    <div class="mb-2"> 
+                        <label for="marca" class="form-label color_azul_negrita">Marca</label>
+                        <select class="form-select select_colores_base" id="marca" name="marca">
+                            <option value="">Selecciona una marca</option>
+                            <option value="volkswagen">Volkswagen</option>
+                            <option value="chevrolet">Chevrolet</option>
+                            <option value="toyota">Toyota</option>
+                            <option value="citroen">Citroen</option>
+                            <option value="ford">Ford</option>
+                            <option value="renault">Renault</option>
+                            <option value="fiat">Fiat</option>
+                            <option value="jeep">Jeep</option>
+                            <option value="mercedesbenz">Mercedes Benz</option>
+                            <option value="mini">Mini</option>
+                            <option value="nissan">Nissan</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="modelo" class="form-label color_azul_negrita">Modelo</label>
+                        <input type="text" id="modelo" name="modelo" class="form-control select_colores_base" placeholder="Escribe la marca">
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="motor" class="form-label color_azul_negrita">Motor</label>
+                        <input type="text" id="motor" name="motor" class="form-control select_colores_base" placeholder="Escribe el tipo de motor">
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="combustible" class="form-label color_azul_negrita">Combustible</label>
+                        <select class="form-select select_colores_base" id="combustible" name="combustible">
+                            <option value="">Selecciona un tipo de combustible</option>
+                            <option value="nafta">Nafta</option>
+                            <option value="diesel">Diesel</option>
+                            <option value="electrico">Eléctrico</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-4">
+                        <!-- Botón Confirmar -->
+                        <button id="boton_configuracion" class="btn btn-primary" type="button">Confirmar</button>
+                        <!-- Botón de Borrar -->
+                        <button id="boton_configuracion02" class="btn btn-danger" type="button">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="container">
+                <h3 class="centrado_automatico color_azul">Datos de Vehículos</h3>
+                <div class="tabla-vehiculos" id="tabla-contenedor">
+                    <table id="csv-table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th id="tabla_config">Marca</th>
+                                <th id="tabla_config">Modelo</th>
+                                <th id="tabla_config">Motor</th>
+                                <th id="tabla_config" style="width: 1px;">Manual</th>
+                                <th id="tabla_config" style="width: 1px;">Automática</th>
+                                <th id="tabla_config" style="width: 1px;">Tipo Combustible</th>
+                                <th id="tabla_config" style="width: 1px;">Capac. Tanque</th>
+                                <th id="tabla_config">Ciudad (km/L)</th>
+                                <th id="tabla_config" style="width: 135px;">Ruta (90 km/h) (km/L)</th>
+                                <th id="tabla_config" style="width: 145px;">Ruta (110 km/h) (km/L)</th>
+                                <th id="tabla_config" style="width: 145px;">Ruta (130 km/h) (km/L)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los datos del CSV se llenarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="container d-flex justify-content-between align-items-center">
+                    <button id="boton-anterior" class="btn btn-secondary boton-vehiculos" style="background-color: #242424;" disabled>Anterior</button>
+                    <span class="fw-bold" id="pagina-actual">1</span>
+                    <button id="boton-siguiente" class="btn btn-secondary boton-vehiculos" style="background-color: #242424;" disabled>Siguiente</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <h3 class="parrafo-vehiculos">Todos los datos fueron creados mediante uso de Inteligencia Artificial, por lo tanto, no son datos totalmente correctos y son solo aproximados o estimados del consumo de cada vehiculo. Todo esto es una ayuda para que los usuarios tengan una referencia de su vehiculo.</h3>
+                <h3 class="parrafo-vehiculos">Recomendamos que tengan sus propios datos para evitar incovenientes</h3>
+            </div>
+            
+        </main>
+
+        <footer>
+            <p>&copy; 2024 EcoRuta - Tu Viaje Economico</p>
+        </footer>
+
+        <!-- Scripts al final del documento -->
+        <script src="/js/main.js"></script>
+        <script src="/js/vehicleSearch.js"></script>
+
+    </body>
+</html>

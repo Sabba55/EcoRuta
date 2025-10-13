@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/style.css">
+
+        <!-- mini logo -->
+        <link rel="shortcut icon" href="./assets/logo_grande.png" type="image/x-icon">
+
+        <!-- Incluye Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Incluye el CSS de Leaflet -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+
+        <!-- Incluye el CSS de Leaflet Routing Machine -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+        <!-- Incluye Leaflet -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+        <!-- Incluye Leaflet Routing Machine -->
+        <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+        <!-- Incluye Leaflet Control Geocoder -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.0/leaflet.markercluster.js"></script>
+
+
+        <title>EcoRuta - Tu Viaje Ecológico</title>
+    </head>
+
+<body>
+    <header id="header">
+        <div id="logo">
+            <a href="/index.html">
+                <img src="/assets/logo_grande.png" alt="EcoRuta">
+            </a>
+        </div>
+        <button id="abrir_hamburguesa" class="abrir_menu"><i class="bi bi-list"></i></button>
+        <nav class="nav" id="nav">
+            <button id="cerrar_hamburguesa" class="cerrar_menu"><i class="bi bi-x-lg"></i></button>
+            <ul class="nav-list">
+                <li><a href="/index.html">Inicio</a></li>
+                <li><a href="./guia_uso.html">Guía de Uso</a></li>
+                <li><a href="./vehiculos.html">Vehiculos</a></li>
+                <li><a href="./configuracion.html">Configuracion</a></li>
+                <li><a href="./nosotros.html">Nosotros</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="nosotros_main">
+        <div id="mission-container">
+            <h2>¿Quiénes somos?</h2>
+            <p>
+                En EcoRuta, nuestro objetivo es facilitar la logística de viajes en Argentina, ya sea para personas o empresas. Ofrecemos cálculos aproximados sobre los costos de combustible y peajes, información básica sobre el consumo del vehículo, y referencias de estaciones de servicio para que puedas planificar tus paradas estratégicamente. Nuestro propósito es ayudarte a disfrutar de un viaje más eficiente, organizado y economico.
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 EcoRuta - Tu Viaje Economico</p>
+    </footer>
+
+    <!-- Scripts al final del documento -->
+    <script src="/js/main.js"></script>
+
+</body>
+</html>

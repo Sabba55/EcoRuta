@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     // ============================================================================================================================
-    // ---------------------------- INICIALIZACIÓN DEL MAPA -----------------------------------
+    // ---------------------------- INICIALIZACIÓN DEL MAPA ----------------------------------------------------------------------
     // ============================================================================================================================
     const mymap = L.map('mapa').setView([-34.61, -58.38], 3); // Inicializar el mapa
 
@@ -43,12 +43,12 @@ document.addEventListener('DOMContentLoaded', function () {
         attribution: '© OpenStreetMap contributors'
     }).addTo(mymap);
 
-    // Agregar control de "Freezy" al mapa
-    L.control.freezeMapControl({
-        freezeOnAdd: false, //para que no se congele al toque
-        hoverToThaw: false,
-        freezeButtonWhenThawed: true, // para no mostrar el boton
-    }).addTo(mymap);
+    // // Agregar control de "Freezy" al mapa
+    // L.control.freezeMapControl({
+    //     freezeOnAdd: false, //para que no se congele al toque
+    //     hoverToThaw: false,
+    //     freezeButtonWhenThawed: true, // para no mostrar el boton
+    // }).addTo(mymap);
 
     // Crear un control de geocodificación
     const geocoder = L.Control.Geocoder.nominatim();
@@ -93,73 +93,94 @@ document.addEventListener('DOMContentLoaded', function () {
     }    
 
     // ============================================================================================================================
-    // ---------------------------------- PRECIOS PROMEDIOS -----------------------------------
+    // ---------------------------------- PRECIOS PROMEDIOS ----------------------------------------------------------------------
     // ============================================================================================================================
-    calcularPreciosPromedioPorProvincia()
+    calcularPreciosPromedioPorProvincia();
+
     function calcularPreciosPromedioPorProvincia() {
-        return fetch('module/SurtiPeaje/precios-en-surtidor-resolucin-3142016.csv') // Devuelve la promesa aquí
+        return fetch('module/SurtiPeaje/precios-en-surtidor-resolucin-3142016.csv')
             .then(response => response.text())
             .then(csvData => {
                 const estaciones = Papa.parse(csvData, { header: true }).data;
-    
-                const preciosPorProvincia = {}; // Objeto para almacenar precios agrupados por provincia y producto
-    
-                // Fecha límite: 1 de junio de 2024
-                const fechaLimite = new Date('2024-06-01');
-    
-                // Recorrer cada estación de servicio
-                estaciones.forEach(estacion => {
-                    const provincia = estacion.provincia; // Asumiendo que el CSV tiene una columna llamada "provincia"
-                    const producto = estacion.producto; // Nombre del producto (Nafta Super, Diesel, etc.)
-                    const precio = parseFloat(estacion.precio); // Precio del producto
-                    const fechaVigencia = new Date(estacion.fecha_vigencia); // Fecha de vigencia
-    
-                    // Validar datos: precio válido, fecha válida y posterior al 1 de junio de 2024
-                    if (
-                        !provincia || 
-                        !producto || 
-                        isNaN(precio) || 
-                        isNaN(fechaVigencia.getTime()) || 
-                        fechaVigencia <= fechaLimite
-                    ) {
-                        return;
-                    }
-    
-                    // Inicializar la estructura si no existe
-                    if (!preciosPorProvincia[provincia]) {
-                        preciosPorProvincia[provincia] = {};
-                    }
-                    if (!preciosPorProvincia[provincia][producto]) {
-                        preciosPorProvincia[provincia][producto] = { total: 0, count: 0 };
-                    }
-    
-                    // Sumar el precio y contar las ocurrencias
-                    preciosPorProvincia[provincia][producto].total += precio;
-                    preciosPorProvincia[provincia][producto].count += 1;
-                });
-    
-                // Calcular el promedio de precios por provincia y producto
-                const resultados = {};
-                for (const provincia in preciosPorProvincia) {
-                    resultados[provincia] = {};
-    
-                    for (const producto in preciosPorProvincia[provincia]) {
-                        const data = preciosPorProvincia[provincia][producto];
-                        resultados[provincia][producto] = (data.total / data.count).toFixed(2); // Promedio con 2 decimales
-                    }
-                }
-    
-                // Mostrar los resultados en la consola
-                return resultados; // Devuelve el resultado procesado
+                const preciosPorProvincia = agruparPreciosPorProvincia(estaciones); //Objeto para almacenar precios agrupados x provincia y producto
+                const resultados = calcularPromedios(preciosPorProvincia);
+                console.log(resultados)
+                return resultados;
             })
             .catch(error => {
                 console.error('Error al cargar el archivo CSV:', error);
-                throw error; // Propaga el error para manejarlo posteriormente
+                throw error;
             });
     }
-    
+
+    function agruparPreciosPorProvincia(estaciones) {
+        const preciosPorProvincia = {};
+        const fechaLimite = new Date('2025-04-01'); // 01/04/2025  ES LA FECHA LIMITE DE PRECIO
+
+        estaciones.forEach(estacion => { // Recorremos cada estacion de servicio para validar
+            if (esEstacionValida(estacion, fechaLimite)) {
+                agregarPrecioAGrupo(preciosPorProvincia, estacion);
+            }
+        });
+
+        return preciosPorProvincia;
+    }
+
+    function esEstacionValida(estacion, fechaLimite) {
+        const provincia = estacion.provincia;
+        const producto = estacion.producto; // Nombre del producto (Nafta Super, Diesel, etc.)
+        const precio = parseFloat(estacion.precio); // Precio del producto
+        const fechaVigencia = new Date(estacion.fecha_vigencia); // Fecha de vigencia
+
+        // Validar datos: precio válido, fecha válida y posterior al 1 de junio de 2024
+        if (
+            !provincia || 
+            !producto || 
+            isNaN(precio) || 
+            isNaN(fechaVigencia.getTime()) || 
+            fechaVigencia <= fechaLimite
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function agregarPrecioAGrupo(preciosPorProvincia, estacion) {
+        const provincia = estacion.provincia;
+        const producto = estacion.producto;
+        const precio = parseFloat(estacion.precio);
+
+        // Inicializar la estructura si no existe
+        if (!preciosPorProvincia[provincia]) {
+            preciosPorProvincia[provincia] = {};
+        }
+        if (!preciosPorProvincia[provincia][producto]) {
+            preciosPorProvincia[provincia][producto] = { total: 0, count: 0 };
+        }
+
+        // Sumar el precio y contar las ocurrencias
+        preciosPorProvincia[provincia][producto].total += precio;
+        preciosPorProvincia[provincia][producto].count += 1;
+    }
+
+    function calcularPromedios(preciosPorProvincia) { // Calcular el promedio de precios por provincia y producto
+        const resultados = {};
+
+        for (const provincia in preciosPorProvincia) {
+            resultados[provincia] = {};
+
+            for (const producto in preciosPorProvincia[provincia]) {
+                const data = preciosPorProvincia[provincia][producto];
+                resultados[provincia][producto] = (data.total / data.count).toFixed(2);
+            }
+        }
+
+        return resultados;
+    }
+
     // ============================================================================================================================
-    // ------------------------------------- CALCULAR RUTA ------------------------------------
+    // ------------------------------------- CALCULAR RUTA -----------------------------------------------------------------------
     // ============================================================================================================================
     let puntosSinCombustibleLayer = L.layerGroup().addTo(mymap);
     let provinciasSinCombustible = [];
@@ -216,34 +237,134 @@ document.addEventListener('DOMContentLoaded', function () {
         let gastoTotalCombustible = 0;
         const tipoCombustible = document.getElementById('inputTipoCombustible').value;
         if (!tipoCombustible) return console.warn('Por favor, selecciona un tipo de combustible');
-    
+
+        // Variables para acumular kilómetros y combustible
+        let kmAcumulados = 0;
+        let combustibleAcumulado = 0;
+
         const promesas = puntos.map(async (item, index) => {
             const provincia = await obtenerProvincia(item.punto.lat, item.punto.lng);
             provinciasSinCombustible.push(provincia);
             
+            // Acumular kilómetros y combustible
+            kmAcumulados += item.distancia;
+            const litrosEnEstePunto = item.distancia / kmsPorLitro;
+            combustibleAcumulado += litrosEnEstePunto;
+
+            // Marcador circular naranja (sin ícono, para que quede debajo)
             const marcador = L.circleMarker([item.punto.lat, item.punto.lng], {
-                 radius: 10, color: 'orange', fillColor: 'orange', fillOpacity: 1 
+                radius: 10, 
+                color: '#ff6b35', 
+                fillColor: '#ff8c42', 
+                fillOpacity: 0.8,
+                weight: 2,
+                zIndexOffset: 999 // Prioridad baja para que quede debajo
                 }).addTo(puntosSinCombustibleLayer);
-    
+
+            // Ícono de bomba de combustible
             const icono = L.divIcon({
                 className: 'fuel-icon', 
                 html: '<i class="bi bi-fuel-pump-fill"></i>',  
                 iconSize: [20, 20],  
                 iconAnchor: [10, 10],  
             });
+
+            // Crear contenido del popup mejorado con valores acumulados
+            const popupContent = `
+                <div class="popup-combustible-modern">
+                    <!-- Header con alerta -->
+                    <div class="popup-combustible-header">
+                        <div class="popup-alerta-icon">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </div>
+                        <div class="popup-alerta-title">
+                            <h3>Recomendamos cargar combustible en esta zona</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="popup-divider"></div>
+                    
+                    <!-- Información del recorrido -->
+                    <div class="popup-combustible-info">
+                        <div class="info-row">
+                            <span class="info-label"><i class="bi bi-speedometer2"></i> Kilómetros recorridos:</span>
+                            <span class="info-value">${kmAcumulados.toFixed(2)} km</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="bi bi-droplet-fill"></i> Combustible consumido:</span>
+                            <span class="info-value">${combustibleAcumulado.toFixed(2)} L</span>
+                        </div>
+                    </div>
+
+                    <div class="popup-divider"></div>
+
+                    <!-- Tabla de estaciones cercanas -->
+                    <div class="popup-estaciones-section">
+                        <h4 class="estaciones-title">Estaciones Cercanas en Radio 10km</h4>
+                        <div class="popup-estaciones-table-container">
+                            <table class="popup-estaciones-table">
+                                <thead>
+                                    <tr>
+                                        <th>Logo</th>
+                                        <th>Localidad</th>
+                                        <th>Precio</th>
+                                        <th>Ubicación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="td-logo">
+                                            <img src="assets/logo_estaciones/ypf.png" alt="YPF" class="estacion-logo">
+                                        </td>
+                                        <td class="td-localidad">San Martín</td>
+                                        <td class="td-precio">$ 850.00</td>
+                                        <td class="td-ubicacion">
+                                            <button class="btn-ubicacion" onclick="alert('Función en desarrollo')">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-logo">
+                                            <img src="assets/logo_estaciones/shell.png" alt="Shell" class="estacion-logo">
+                                        </td>
+                                        <td class="td-localidad">Centro</td>
+                                        <td class="td-precio">$ 855.00</td>
+                                        <td class="td-ubicacion">
+                                            <button class="btn-ubicacion" onclick="alert('Función en desarrollo')">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-logo">
+                                            <img src="assets/logo_estaciones/axion.png" alt="Axion" class="estacion-logo">
+                                        </td>
+                                        <td class="td-localidad">Villa Nueva</td>
+                                        <td class="td-precio">$ 848.00</td>
+                                        <td class="td-ubicacion">
+                                            <button class="btn-ubicacion" onclick="alert('Función en desarrollo')">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Marcador con ícono (CON ALTA PRIORIDAD)
+            const marcadorConIcono = L.marker([item.punto.lat, item.punto.lng], { 
+                icon: icono,
+                zIndexOffset: 1000 // Alta prioridad para que aparezca siempre arriba
+            }).addTo(puntosSinCombustibleLayer);
             
-
-
-
-
-            // --- MEJORAR ---
-            const marcadorConIcono = L.marker([item.punto.lat, item.punto.lng], { icon: icono }).addTo(puntosSinCombustibleLayer);
-            marcadorConIcono.bindPopup(`Recorriste: ${item.distancia.toFixed(2)} km`);
-                
-
-
-
-
+            marcadorConIcono.bindPopup(popupContent, {
+                maxWidth: 400,
+                className: 'custom-popup-combustible'
+            });
 
             const provinciaCalculo = index === 0 ? provinciasSinCombustible[0] : provinciasSinCombustible[index];
             const precioLitro = preciosPorProvincia[provinciaCalculo]?.[tipoCombustible] || localStorage.getItem("precio-combustible");
@@ -251,12 +372,12 @@ document.addEventListener('DOMContentLoaded', function () {
             gastoTotalCombustible += costoEnProvincia;
         });
         await Promise.all(promesas);
-    
+
         const ultimaProvincia = provinciasSinCombustible.at(-1);
         const precioUltimaProvincia = preciosPorProvincia[ultimaProvincia]?.[tipoCombustible] || localStorage.getItem("precio-combustible");
         const distanciaRestante = parseFloat(document.getElementById('resultado-km').innerText) - puntos.reduce((acc, item) => acc + item.distancia, 0);
         gastoTotalCombustible += (distanciaRestante / kmsPorLitro) * precioUltimaProvincia;
-    
+
         document.getElementById("resultado-gasto").textContent = `$ ${gastoTotalCombustible.toFixed(2)}`;
         document.getElementById("gasto-total").textContent = `$ ${(parseFloat(gastoTotalCombustible) + parseFloat(gastoTotalPeajes)).toFixed(2)}`;
 
@@ -276,6 +397,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 waypoints: [L.latLng(marcadorOrigen.getLatLng()), L.latLng(marcadorDestino.getLatLng())],
                 routeWhileDragging: true,
                 show: true,
+                // lineOptions: {
+                //     styles: [
+                //         { color: '#000000ff', weight: 5, opacity: 0.8 },  // Ruta principal azul
+                //         { color: '#ff0000ff', weight: 2, opacity: 0.6 }   // Borde blanco
+                //     ]
+                // },
+                //createMarker: function() { return null; } // Ocultar marcadores por defecto de leaflet-routing
             }).addTo(mymap);
             
             rutaControl.on('routesfound', (event) => procesarRuta(event, preciosPorProvincia));
@@ -289,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     // ============================================================================================================================
-    // ------------------------------------- PEAJES JSON --------------------------------------
+    // ------------------------------------- PEAJES JSON -------------------------------------------------------------------------
     // ============================================================================================================================
     
     // ============== CONFIGURACIÓN Y VARIABLES GLOBALES - PEAJES
@@ -397,7 +525,6 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     }
 
-    
     // ============== FUNCIONES DE GESTIÓN DE MARCADORES
     function crearIconoPeaje() {
         return L.divIcon({
@@ -578,7 +705,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     // ============================================================================================================================
-    // ----------------------- CARGAR ESTACIONES DE SERVICIOS CSV -----------------------------    
+    // ----------------------- CARGAR ESTACIONES DE SERVICIOS CSV -----------------------------------------------------------------
     // ============================================================================================================================
 
     // ============== CONFIGURACIÓN Y VARIABLES GLOBALES 
@@ -886,76 +1013,82 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error al cargar las estaciones de servicio:', error);
         });
 
-
     // ============================================================================================================================
-    // --------------------------------- ENVÍO DEL FORMULARIO ---------------------------------
+    // --------------------------------- ENVÍO DEL FORMULARIO ---------------------------------------------------------------------
     // ============================================================================================================================
     const formularioViaje = document.getElementById('formulario-viaje');
     const mapaSection = document.getElementById("mapa");
+
     formularioViaje.addEventListener('submit', function (event) {
-        event.preventDefault(); // Evita que el formulario se envíe
+        event.preventDefault();
+        manejarEnvioFormulario();
+    });
+
+    function manejarEnvioFormulario() {
         mapaSection.scrollIntoView({ behavior: "smooth" });
 
         const origen = document.getElementById('inputOrigen').value;
         const destino = document.getElementById('inputDestino').value;
 
         if (origen && destino) {
-            // Eliminar marcadores previos si existen
-            if (marcadorOrigen) {
-                mymap.removeLayer(marcadorOrigen);
-                marcadorOrigen = null;
-            }
-            if (marcadorDestino) {
-                mymap.removeLayer(marcadorDestino);
-                marcadorDestino = null;
-            }
-
-            // Consultar coordenadas del origen
-            fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(origen)}&format=json&addressdetails=1`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length > 0) {
-                        const coordenadas = [data[0].lat, data[0].lon];
-                        marcadorOrigen = L.marker(coordenadas).addTo(mymap).bindPopup(`<b>Origen:</b> ${origen}`);
-
-                        // Verificar si ya tenemos el destino cargado para ajustar la vista
-                        if (marcadorDestino) {
-                            ajustarVista();
-                        }
-                    } else {
-                        console.error("No se encontraron resultados para el origen:", origen);
-                    }
-                })
-                .catch(error => console.error("Error al consultar Nominatim para el origen:", error));
-
-            // Consultar coordenadas del destino
-            fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(destino)}&format=json&addressdetails=1`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length > 0) {
-                        const coordenadas = [data[0].lat, data[0].lon];
-                        
-                        marcadorDestino = L.marker(coordenadas).addTo(mymap).bindPopup(`<b>Destino:</b> ${destino}`);
-
-                        // Verificar si ya tenemos el origen cargado para ajustar la vista
-                        if (marcadorOrigen) {
-                            ajustarVista();
-                        }
-                    } else {
-                        console.error("No se encontraron resultados para el destino:", destino);
-                    }
-                })
-                .catch(error => console.error("Error al consultar Nominatim para el destino:", error));
-
-            // Obtener el tipo de combustible seleccionado
-            const selectedCombustible = document.getElementById('inputTipoCombustible').value;
-
-            // Cargar nuevas estaciones de servicio
-            cargarEstacionesPorTipo(selectedCombustible)
-                .then(cluster => {
-                    markerCluster = cluster;
-                })
-                .catch(error => console.error('Error al cargar las estaciones de servicio:', error));
+            limpiarMarcadoresPrevios();
+            procesarOrigenYDestino(origen, destino);
+            cargarEstacionesPorCombustibleSeleccionado();
         }
-    });
+    }
+
+    function limpiarMarcadoresPrevios() {
+        if (marcadorOrigen) {
+            mymap.removeLayer(marcadorOrigen);
+            marcadorOrigen = null;
+        }
+        if (marcadorDestino) {
+            mymap.removeLayer(marcadorDestino);
+            marcadorDestino = null;
+        }
+    }
+
+    function procesarOrigenYDestino(origen, destino) {
+        buscarYCrearMarcador(origen, 'origen');
+        buscarYCrearMarcador(destino, 'destino');
+    }
+
+    function buscarYCrearMarcador(lugar, tipo) {
+        const urlBusqueda = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(lugar)}&format=json&addressdetails=1`;
+
+        fetch(urlBusqueda)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    crearMarcadorEnMapa(data[0], lugar, tipo);
+                } else {
+                    console.error(`No se encontraron resultados para el ${tipo}:`, lugar);
+                }
+            })
+            .catch(error => console.error(`Error al consultar Nominatim para el ${tipo}:`, error));
+    }
+
+    function crearMarcadorEnMapa(data, lugar, tipo) {
+        const coordenadas = [data.lat, data.lon];
+        const etiqueta = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+        const marcador = L.marker(coordenadas).addTo(mymap).bindPopup(`<b>${etiqueta}:</b> ${lugar}`);
+
+        if (tipo === 'origen') {
+            marcadorOrigen = marcador;
+            if (marcadorDestino) ajustarVista();
+        } else if (tipo === 'destino') {
+            marcadorDestino = marcador;
+            if (marcadorOrigen) ajustarVista();
+        }
+    }
+
+    function cargarEstacionesPorCombustibleSeleccionado() {
+        const selectedCombustible = document.getElementById('inputTipoCombustible').value;
+
+        cargarEstacionesPorTipo(selectedCombustible)
+            .then(cluster => {
+                markerCluster = cluster;
+            })
+            .catch(error => console.error('Error al cargar las estaciones de servicio:', error));
+    }
 });
