@@ -1275,6 +1275,7 @@ footer {
     transform: scale(1.1);
 }
 
+/*    ÍCONO DE COMBUSTIBLE EN EL MAPA    */
 .fuel-icon {
     display: flex;
     align-items: center;
@@ -1290,6 +1291,8 @@ footer {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+
+/*    MENSAJE SIN ESTACIONES CERCANAS    */
 .no-estaciones-mensaje {
     display: flex;
     flex-direction: column;
@@ -1314,6 +1317,28 @@ footer {
     font-weight: 500;
     color: #475569;
     line-height: 1.5;
+}
+
+
+/*    ANIMACIÓN DE BOUNCE PARA MARCADORES    */
+
+@keyframes markerBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    25% {
+        transform: translateY(-15px);
+    }
+    50% {
+        transform: translateY(-7px);
+    }
+    75% {
+        transform: translateY(-12px);
+    }
+}
+
+.marker-bounce {
+    animation: markerBounce 0.6s ease-in-out;
 }
 
 /* Responsive */

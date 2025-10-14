@@ -1,3 +1,7 @@
+// Declarar variables del mapa como globales (ANTES del DOMContentLoaded)
+let mymap;
+let markerCluster;
+
 document.addEventListener('DOMContentLoaded', function () {
     // Menu hamburguesa
     const nav = document.querySelector("#nav");
@@ -36,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============================================================================================================================
     // ---------------------------- INICIALIZACIÓN DEL MAPA ----------------------------------------------------------------------
     // ============================================================================================================================
-    const mymap = L.map('mapa').setView([-34.61, -58.38], 3); // Inicializar el mapa
+    mymap = L.map('mapa').setView([-34.61, -58.38], 3); // Inicializar el mapa
 
     // Capa de azulejos de OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -226,6 +230,72 @@ document.addEventListener('DOMContentLoaded', function () {
         await procesarPuntosSinCombustible(puntosSinCombustible, preciosPorProvincia, kmsPorLitro);
     }
     
+    function volarHaciaEstacion(lat, lng, empresa, localidad) {
+        // Animar el mapa hacia la estación con efecto suave
+        mymap.flyTo([lat, lng], 16, {
+            duration: 1.5, // Duración de la animación en segundos
+            easeLinearity: 0.25
+        });
+
+        // Esperar a que termine la animación y luego resaltar la estación
+        setTimeout(() => {
+            // Buscar el marcador de la estación en el cluster
+            let marcadorEncontrado = null;
+            
+            markerCluster.eachLayer(function(layer) {
+                if (layer.getLatLng) {
+                    const markerLatLng = layer.getLatLng();
+                    // Comparar coordenadas con tolerancia de 0.0001 grados (~11 metros)
+                    if (Math.abs(markerLatLng.lat - lat) < 0.0001 && 
+                        Math.abs(markerLatLng.lng - lng) < 0.0001) {
+                        marcadorEncontrado = layer;
+                    }
+                }
+            });
+
+            // Si encontramos el marcador, abrimos su popup
+            if (marcadorEncontrado) {
+                // Desagrupar el cluster si está agrupado
+                markerCluster.zoomToShowLayer(marcadorEncontrado, () => {
+                    marcadorEncontrado.openPopup();
+                    
+                    // Efecto visual: hacer bounce al marcador
+                    const icon = marcadorEncontrado.getElement();
+                    if (icon) {
+                        icon.classList.add('marker-bounce');
+                        setTimeout(() => {
+                            icon.classList.remove('marker-bounce');
+                        }, 1000);
+                    }
+                });
+            } else {
+                // Si no encontramos el marcador exacto, mostrar notificación
+                console.log(`Estación encontrada: ${empresa} - ${localidad}`);
+                
+                // Crear un marcador temporal para resaltar la ubicación
+                const marcadorTemporal = L.circleMarker([lat, lng], {
+                    radius: 15,
+                    color: '#ff6b35',
+                    fillColor: '#ff8c42',
+                    fillOpacity: 0.6,
+                    weight: 3
+                }).addTo(mymap);
+
+                // Crear popup temporal
+                marcadorTemporal.bindPopup(`
+                    <div style="text-align: center; padding: 10px;">
+                        <strong>${empresa}</strong><br>
+                        <span style="color: #64748b;">${localidad}</span>
+                    </div>
+                `).openPopup();
+
+                // Remover el marcador temporal después de 3 segundos
+                setTimeout(() => {
+                    mymap.removeLayer(marcadorTemporal);
+                }, 3000);
+            }
+        }, 1500); // Esperar a que termine la animación flyTo
+    }
 
     async function procesarPuntosSinCombustible(puntos, preciosPorProvincia, kmsPorLitro) {
         let gastoTotalCombustible = 0;
@@ -252,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fillColor: '#ff8c42', 
                 fillOpacity: 0.8,
                 weight: 2,
-                zIndexOffset: -100 // Prioridad baja para que quede debajo
+                zIndexOffset: 999 // Prioridad baja para que quede debajo
                 }).addTo(puntosSinCombustibleLayer);
 
             // Ícono de bomba de combustible
@@ -268,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 item.punto.lat, 
                 item.punto.lng, 
                 tipoCombustible, 
-                20 // Radio en km
+                18 // Radio en km
             );
 
             // Generar HTML de la tabla de estaciones
@@ -289,11 +359,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <th>Logo</th>
                                     <th>Localidad</th>
                                     <th>Precio</th>
-                                    <th>Ubicación</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${estacionesCercanas.map(estacion => `
+                                ${estacionesCercanas.map((estacion, idx) => `
                                     <tr>
                                         <td class="td-logo">
                                             <img src="${estacion.logo}" alt="${estacion.empresa}" class="estacion-logo">
@@ -301,7 +371,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                         <td class="td-localidad">${estacion.localidad}</td>
                                         <td class="td-precio">$ ${estacion.precio}</td>
                                         <td class="td-ubicacion">
-                                            <button class="btn-ubicacion" onclick="alert('Función en desarrollo')">
+                                            <button class="btn-ubicacion" 
+                                                    onclick="volarHaciaEstacion(${estacion.latitud}, ${estacion.longitud}, '${estacion.empresa}', '${estacion.localidad}'); return false;">
                                                 <i class="bi bi-geo-alt-fill"></i>
                                             </button>
                                         </td>
@@ -344,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     <!-- Tabla de estaciones cercanas -->
                     <div class="popup-estaciones-section">
-                        <h4 class="estaciones-title">Estaciones Cercanas en Radio 15km</h4>
+                        <h4 class="estaciones-title">Estaciones cercanas en un radio de 15km</h4>
                         ${tablaEstacionesHTML}
                     </div>
                 </div>
@@ -401,7 +472,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 //createMarker: function() { return null; } // Ocultar marcadores por defecto de leaflet-routing
             }).addTo(mymap);
             
-            rutaControl.on('routesfound', (event) => procesarRuta(event, preciosPorProvincia));
+            // Evento cuando se encuentra/actualiza una ruta
+            rutaControl.on('routesfound', (event) => {
+                // Limpiar puntos de combustible anteriores
+                provinciasSinCombustible = [provinciaOrigen];
+                puntosSinCombustibleLayer.clearLayers();
+                
+                // Procesar la nueva ruta
+                procesarRuta(event, preciosPorProvincia);
+            });
+
+            // Evento cuando cambio los waypoints de forma manual
             rutaControl.on('waypointschanged', () => {
                 provinciasSinCombustible = [];
                 puntosSinCombustibleLayer.clearLayers();
@@ -1145,3 +1226,148 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error al cargar las estaciones de servicio:', error));
     }
 });
+
+
+
+// ============================================================================================================================
+// --------------------------------- VOLAR HACIA ESTACIÓN (FUNCIÓN GLOBAL) ---------------------------------------------------
+// ============================================================================================================================
+
+// IMPORTANTE: Esta función debe estar FUERA del DOMContentLoaded para ser accesible desde onclick
+function volarHaciaEstacion(lat, lng, empresa, localidad) {
+    // Animar el mapa hacia la estación con efecto suave
+    mymap.flyTo([lat, lng], 16, {
+        duration: 1.5, // Duración de la animación en segundos
+        easeLinearity: 0.25
+    });
+
+    // Esperar a que termine la animación y luego resaltar la estación
+    setTimeout(() => {
+        // Buscar el marcador de la estación en el cluster
+        let marcadorEncontrado = null;
+        
+        markerCluster.eachLayer(function(layer) {
+            if (layer.getLatLng) {
+                const markerLatLng = layer.getLatLng();
+                // Comparar coordenadas con tolerancia de 0.0001 grados (~11 metros)
+                if (Math.abs(markerLatLng.lat - lat) < 0.0001 && 
+                    Math.abs(markerLatLng.lng - lng) < 0.0001) {
+                    marcadorEncontrado = layer;
+                }
+            }
+        });
+
+        // Si encontramos el marcador, abrimos su popup
+        if (marcadorEncontrado) {
+            // Desagrupar el cluster si está agrupado
+            markerCluster.zoomToShowLayer(marcadorEncontrado, () => {
+                marcadorEncontrado.openPopup();
+                
+                // Efecto visual: hacer bounce al marcador
+                const icon = marcadorEncontrado.getElement();
+                if (icon) {
+                    icon.classList.add('marker-bounce');
+                    setTimeout(() => {
+                        icon.classList.remove('marker-bounce');
+                    }, 1000);
+                }
+            });
+        } else {
+            // Si no encontramos el marcador exacto, mostrar notificación
+            console.log(`Estación encontrada: ${empresa} - ${localidad}`);
+            
+            // Crear un marcador temporal para resaltar la ubicación
+            const marcadorTemporal = L.circleMarker([lat, lng], {
+                radius: 15,
+                color: '#ff6b35',
+                fillColor: '#ff8c42',
+                fillOpacity: 0.6,
+                weight: 3
+            }).addTo(mymap);
+
+            // Crear popup temporal
+            marcadorTemporal.bindPopup(`
+                <div style="text-align: center; padding: 10px;">
+                    <strong>${empresa}</strong><br>
+                    <span style="color: #64748b;">${localidad}</span>
+                </div>
+            `).openPopup();
+
+            // Remover el marcador temporal después de 3 segundos
+            setTimeout(() => {
+                mymap.removeLayer(marcadorTemporal);
+            }, 3000);
+        }
+    }, 1500); // Esperar a que termine la animación flyTo
+}
+
+// NOTA: Coloca esta función AL FINAL de tu archivo main.js, FUERA del document.addEventListener('DOMContentLoaded', ...)// ============================================================================================================================
+// --------------------------------- VOLAR HACIA ESTACIÓN ---------------------------------------------------------------------
+// ============================================================================================================================
+
+function volarHaciaEstacion(lat, lng, empresa, localidad) {
+    // Animar el mapa hacia la estación con efecto suave
+    mymap.flyTo([lat, lng], 16, {
+        duration: 1.5, // Duración de la animación en segundos
+        easeLinearity: 0.25
+    });
+
+    // Esperar a que termine la animación y luego resaltar la estación
+    setTimeout(() => {
+        // Buscar el marcador de la estación en el cluster
+        let marcadorEncontrado = null;
+        
+        markerCluster.eachLayer(function(layer) {
+            if (layer.getLatLng) {
+                const markerLatLng = layer.getLatLng();
+                // Comparar coordenadas con tolerancia de 0.0001 grados (~11 metros)
+                if (Math.abs(markerLatLng.lat - lat) < 0.0001 && 
+                    Math.abs(markerLatLng.lng - lng) < 0.0001) {
+                    marcadorEncontrado = layer;
+                }
+            }
+        });
+
+        // Si encontramos el marcador, abrimos su popup
+        if (marcadorEncontrado) {
+            // Desagrupar el cluster si está agrupado
+            markerCluster.zoomToShowLayer(marcadorEncontrado, () => {
+                marcadorEncontrado.openPopup();
+                
+                // Efecto visual: hacer bounce al marcador
+                const icon = marcadorEncontrado.getElement();
+                if (icon) {
+                    icon.classList.add('marker-bounce');
+                    setTimeout(() => {
+                        icon.classList.remove('marker-bounce');
+                    }, 1000);
+                }
+            });
+        } else {
+            // Si no encontramos el marcador exacto, mostrar notificación
+            console.log(`Estación encontrada: ${empresa} - ${localidad}`);
+            
+            // Crear un marcador temporal para resaltar la ubicación
+            const marcadorTemporal = L.circleMarker([lat, lng], {
+                radius: 15,
+                color: '#ff6b35',
+                fillColor: '#ff8c42',
+                fillOpacity: 0.6,
+                weight: 3
+            }).addTo(mymap);
+
+            // Crear popup temporal
+            marcadorTemporal.bindPopup(`
+                <div style="text-align: center; padding: 10px;">
+                    <strong>${empresa}</strong><br>
+                    <span style="color: #64748b;">${localidad}</span>
+                </div>
+            `).openPopup();
+
+            // Remover el marcador temporal después de 3 segundos
+            setTimeout(() => {
+                mymap.removeLayer(marcadorTemporal);
+            }, 3000);
+        }
+    }, 1500); // Esperar a que termine la animación flyTo
+}
