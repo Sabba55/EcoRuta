@@ -43,13 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
         attribution: '© OpenStreetMap contributors'
     }).addTo(mymap);
 
-    // // Agregar control de "Freezy" al mapa
-    // L.control.freezeMapControl({
-    //     freezeOnAdd: false, //para que no se congele al toque
-    //     hoverToThaw: false,
-    //     freezeButtonWhenThawed: true, // para no mostrar el boton
-    // }).addTo(mymap);
-
     // Crear un control de geocodificación
     const geocoder = L.Control.Geocoder.nominatim();
     let marcadorOrigen, marcadorDestino, rutaControl;
@@ -233,6 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
         await procesarPuntosSinCombustible(puntosSinCombustible, preciosPorProvincia, kmsPorLitro);
     }
     
+
     async function procesarPuntosSinCombustible(puntos, preciosPorProvincia, kmsPorLitro) {
         let gastoTotalCombustible = 0;
         const tipoCombustible = document.getElementById('inputTipoCombustible').value;
@@ -258,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fillColor: '#ff8c42', 
                 fillOpacity: 0.8,
                 weight: 2,
-                zIndexOffset: 999 // Prioridad baja para que quede debajo
+                zIndexOffset: -100 // Prioridad baja para que quede debajo
                 }).addTo(puntosSinCombustibleLayer);
 
             // Ícono de bomba de combustible
@@ -268,6 +262,56 @@ document.addEventListener('DOMContentLoaded', function () {
                 iconSize: [20, 20],  
                 iconAnchor: [10, 10],  
             });
+
+            // Buscar estaciones cercanas
+            const estacionesCercanas = await buscarEstacionesCercanas(
+                item.punto.lat, 
+                item.punto.lng, 
+                tipoCombustible, 
+                20 // Radio en km
+            );
+
+            // Generar HTML de la tabla de estaciones
+            let tablaEstacionesHTML = '';
+            if (estacionesCercanas.length === 0) {
+                tablaEstacionesHTML = `
+                    <div class="no-estaciones-mensaje">
+                        <i class="bi bi-info-circle"></i>
+                        <p>No se encontraron estaciones cercanas, utilice el mapa para su planificación</p>
+                    </div>
+                `;
+            } else {
+                tablaEstacionesHTML = `
+                    <div class="popup-estaciones-table-container">
+                        <table class="popup-estaciones-table">
+                            <thead>
+                                <tr>
+                                    <th>Logo</th>
+                                    <th>Localidad</th>
+                                    <th>Precio</th>
+                                    <th>Ubicación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${estacionesCercanas.map(estacion => `
+                                    <tr>
+                                        <td class="td-logo">
+                                            <img src="${estacion.logo}" alt="${estacion.empresa}" class="estacion-logo">
+                                        </td>
+                                        <td class="td-localidad">${estacion.localidad}</td>
+                                        <td class="td-precio">$ ${estacion.precio}</td>
+                                        <td class="td-ubicacion">
+                                            <button class="btn-ubicacion" onclick="alert('Función en desarrollo')">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
 
             // Crear contenido del popup mejorado con valores acumulados
             const popupContent = `
@@ -300,57 +344,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     <!-- Tabla de estaciones cercanas -->
                     <div class="popup-estaciones-section">
-                        <h4 class="estaciones-title">Estaciones Cercanas en Radio 10km</h4>
-                        <div class="popup-estaciones-table-container">
-                            <table class="popup-estaciones-table">
-                                <thead>
-                                    <tr>
-                                        <th>Logo</th>
-                                        <th>Localidad</th>
-                                        <th>Precio</th>
-                                        <th>Ubicación</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="td-logo">
-                                            <img src="assets/logo_estaciones/ypf.png" alt="YPF" class="estacion-logo">
-                                        </td>
-                                        <td class="td-localidad">San Martín</td>
-                                        <td class="td-precio">$ 850.00</td>
-                                        <td class="td-ubicacion">
-                                            <button class="btn-ubicacion" onclick="alert('Función en desarrollo')">
-                                                <i class="bi bi-geo-alt-fill"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="td-logo">
-                                            <img src="assets/logo_estaciones/shell.png" alt="Shell" class="estacion-logo">
-                                        </td>
-                                        <td class="td-localidad">Centro</td>
-                                        <td class="td-precio">$ 855.00</td>
-                                        <td class="td-ubicacion">
-                                            <button class="btn-ubicacion" onclick="alert('Función en desarrollo')">
-                                                <i class="bi bi-geo-alt-fill"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="td-logo">
-                                            <img src="assets/logo_estaciones/axion.png" alt="Axion" class="estacion-logo">
-                                        </td>
-                                        <td class="td-localidad">Villa Nueva</td>
-                                        <td class="td-precio">$ 848.00</td>
-                                        <td class="td-ubicacion">
-                                            <button class="btn-ubicacion" onclick="alert('Función en desarrollo')">
-                                                <i class="bi bi-geo-alt-fill"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <h4 class="estaciones-title">Estaciones Cercanas en Radio 15km</h4>
+                        ${tablaEstacionesHTML}
                     </div>
                 </div>
             `;
@@ -413,6 +408,64 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         } catch (error) {
             console.error('Error al calcular la ruta:', error);
+        }
+    }
+
+    async function buscarEstacionesCercanas(lat, lng, tipoCombustible, radioKm) {
+        try {
+            const response = await fetch('module/SurtiPeaje/precios-en-surtidor-resolucin-3142016.csv');
+            const csvData = await response.text();
+            const estaciones = Papa.parse(csvData, { header: true }).data;
+
+            // Mapa para almacenar estaciones únicas por dirección
+            const estacionesUnicas = new Map();
+
+            // Filtrar estaciones por tipo de combustible y calcular distancias
+            estaciones.forEach(estacion => {
+                // Validar que tenga el tipo de combustible seleccionado
+                if (estacion.producto !== tipoCombustible) return;
+                
+                // Validar coordenadas válidas
+                const latitud = parseFloat(estacion.latitud);
+                const longitud = parseFloat(estacion.longitud);
+                if (isNaN(latitud) || isNaN(longitud)) return;
+                
+                // Validar precio válido
+                const precio = parseFloat(estacion.precio);
+                if (isNaN(precio)) return;
+                
+                // Calcular distancia usando Leaflet
+                const distancia = L.latLng(lat, lng).distanceTo(L.latLng(latitud, longitud)) / 1000; // Convertir a km
+                
+                // Filtrar por radio
+                if (distancia > radioKm) return;
+                
+                // Crear clave única usando dirección + coordenadas para evitar duplicados
+                const claveUnica = `${estacion.direccion}_${latitud.toFixed(6)}_${longitud.toFixed(6)}`;
+                
+                // Si no existe o si el precio es mejor, agregar/actualizar
+                if (!estacionesUnicas.has(claveUnica)) {
+                    estacionesUnicas.set(claveUnica, {
+                        empresa: estacion.empresabandera,
+                        localidad: estacion.localidad || estacion.direccion || 'Sin localidad',
+                        precio: precio.toFixed(2),
+                        distancia: distancia,
+                        latitud: latitud,
+                        longitud: longitud,
+                        logo: companyLogoPaths[estacion.empresabandera] || companyLogoPaths['BLANCA']
+                    });
+                }
+            });
+
+            // Convertir Map a array, ordenar por distancia y tomar las 3 más cercanas
+            const estacionesConDistancia = Array.from(estacionesUnicas.values())
+                .sort((a, b) => a.distancia - b.distancia)
+                .slice(0, 3);
+
+            return estacionesConDistancia;
+        } catch (error) {
+            console.error('Error al buscar estaciones cercanas:', error);
+            return [];
         }
     }
     

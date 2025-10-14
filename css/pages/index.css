@@ -903,7 +903,7 @@ footer {
 }
 
 .vehiculo-img {
-    width: 35px;
+    width: 50px;
     height: auto;
     display: block;
     margin: 0 auto;
@@ -1288,6 +1288,32 @@ footer {
     align-items: center;
     justify-content: center;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.no-estaciones-mensaje {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+    border-radius: 8px;
+    border: 2px dashed #ff6b35;
+    text-align: center;
+}
+
+.no-estaciones-mensaje i {
+    font-size: 2rem;
+    color: #ff6b35;
+    margin-bottom: 10px;
+}
+
+.no-estaciones-mensaje p {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    line-height: 1.5;
 }
 
 /* Responsive */
